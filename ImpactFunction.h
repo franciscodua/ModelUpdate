@@ -15,6 +15,7 @@ private:
     int *maxRange;
 
 public:
+    ImpactFunction(int percentage, int nDimensions, int *weights, int *minRange, int *maxRange);
 
     int getPercentage() const {
         return percentage;
@@ -31,6 +32,16 @@ public:
     int getWeight(int dimension) {
         return this->weights[dimension];
     }
+
+    int getMinRange(int dimension) {
+        return this->minRange[dimension];
+    }
+
+    int getMaxRange(int dimension) {
+        return this->maxRange[dimension];
+    }
+
+    int computeOutput(int *variables);
 };
 
 

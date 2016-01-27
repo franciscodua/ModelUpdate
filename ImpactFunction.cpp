@@ -20,3 +20,16 @@ ImpactFunction::ImpactFunction(int percentage, int nDimensions, int *weights, in
     this->minRange = copyArray(minRange, nDimensions - 1);
     this->maxRange = copyArray(maxRange, nDimensions - 1);
 }
+
+int ImpactFunction::computeOutput(int *variables) {
+    int result = 0;
+    int size;
+
+    size = sizeof(variables)/sizeof(variables[0]);
+
+    for (int i = 0; i < size; i++) {
+        result += variables[i] * getWeight(i);
+    }
+
+    return result;
+}
