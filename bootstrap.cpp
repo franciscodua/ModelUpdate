@@ -8,20 +8,41 @@
 #include <iostream>
 #include "bootstrap.h"
 
+int drop_tables(sqlite3 *db) {
+    int rCode;
+    const char *sqlDropSamples, *sqlDropImpact;
+    char *errMsg;
 
-int init_db (std::string file) {
-    sqlite3 *db;
+    sqlDropSamples = "DROP TABLE IF EXISTS Samples;";
+    sqlDropImpact = "DROP TABLE IF EXISTS Impact_Functions";
+
+    rCode = sqlite3_exec(db, sqlDropSamples, NULL, NULL, &errMsg);
+
+    if (rCode != SQLITE_OK) {
+        fprintf(stderr, "SQL error: %s\n", errMsg);
+        sqlite3_free(errMsg);
+        return 1;
+    }
+    std::cout << "SQL: Samples Dropped" << std::endl;
+
+    rCode = sqlite3_exec(db, sqlDropImpact, NULL, NULL, &errMsg);
+
+    if (rCode != SQLITE_OK) {
+        fprintf(stderr, "SQL error: %s\n", errMsg);
+        sqlite3_free(errMsg);
+        return 1;
+    }
+    std::cout << "SQL: Impact_Functions Dropped" << std::endl;
+
+    return 0;
+}
+
+
+int create_tables(sqlite3 *db) {
     int rCode;
     const char* sqlCreateSamples;
     const char* sqlCreateImpact;
     char *errMsg;
-
-    rCode = sqlite3_open(file.c_str(), &db);
-
-    if(rCode != SQLITE_OK) {
-        fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
-        sqlite3_close(db);
-    }
 
     sqlCreateSamples =    "CREATE TABLE Samples ("
             "RspTime INT    NOT NULL,"
@@ -55,6 +76,28 @@ int init_db (std::string file) {
     }
 
     std::cout << "SQL: Impact_Functions Created" << std::endl;
+
+    return 0;
+}
+
+int init_db (std::string file) {
+    sqlite3 *db;
+    int rCode;
+
+    rCode = sqlite3_open(file.c_str(), &db);
+
+    if(rCode != SQLITE_OK) {
+        fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
+        sqlite3_close(db);
+    }
+
+    if (drop_tables(db)) {
+        return 1;
+    }
+
+    if (create_tables(db)) {
+        return 1;
+    }
 
     sqlite3_close(db);
     return 0;
