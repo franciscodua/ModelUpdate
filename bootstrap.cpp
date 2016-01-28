@@ -175,6 +175,7 @@ void generate_samples(ImpactFunction *impact, int impactId, sqlite3 *db) {
     std::vector<int> minRanges(2);
     std::vector<int> maxRanges(2);
     int rest;
+    int samplingLastCol;
 
     nDimensions = impact->getNDimensions();
     //vars = new float[nDimensions-1];
@@ -187,26 +188,28 @@ void generate_samples(ImpactFunction *impact, int impactId, sqlite3 *db) {
         maxRanges[i] = (int) impact->getMaxRange(i);
     }
 
-    samplingIntervalX = (float) ((maxRanges[0] - minRanges[0]) / sqrt(samples));
-    samplingIntervalY = (float) ((maxRanges[1] - minRanges[1]) / sqrt(samples));
+    samplingIntervalX = (float) ((maxRanges[0] - minRanges[0]) / floor(sqrt(samples)));
+    samplingIntervalY = (float) ((maxRanges[1] - minRanges[1]) / floor(sqrt(samples)));
 
     samplesPerRow = floor(sqrt(samples));
     rest = samples - (samplesPerRow*samplesPerRow);
 
     for (int x = 0; x < samplesPerRow; x++) {
         for (int y = 0; y < samplesPerRow; y++) {
-            vars[0] = x * samplingIntervalX;
-            vars[1] = y * samplingIntervalY;
+            vars[0] = minRanges[0] + (x * samplingIntervalX) + (samplingIntervalX / 2);
+            vars[1] = minRanges[1] + (y * samplingIntervalY) + (samplingIntervalX / 2);
             add_sample(vars[0], vars[1], impact->computeOutput(vars), impactId, db);
         }
     }
-    srand((unsigned int) time(NULL));
+
+    samplingLastCol = (maxRanges[1] - minRanges[1]) / rest;
+    vars[0] = samplesPerRow * samplingIntervalX;
     for (int i = 0; i < rest; i++) {
-        vars[0] = minRanges[0] + rand() % (maxRanges[0] - minRanges[0]);
-        vars[1] = minRanges[1] + rand() % (maxRanges[1] - minRanges[1]);
+        vars[1] = minRanges[0] + (i * samplingLastCol) + (samplingLastCol / 2);
 
         add_sample(vars[0], vars[1], impact->computeOutput(vars), impactId, db);
     }
+
 }
 
 int init_db (std::string file) {
