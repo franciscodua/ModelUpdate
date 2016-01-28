@@ -170,23 +170,25 @@ void generate_samples(ImpactFunction *impact, int impactId, sqlite3 *db) {
     int nDimensions;
     int samples, samplesPerRow;
     float samplingIntervalX, samplingIntervalY;
-    float *vars;
-    int *minRanges, *maxRanges;
+    std::vector<float> vars (2);
+    //int *minRanges, *maxRanges;
+    std::vector<int> minRanges(2);
+    std::vector<int> maxRanges(2);
     int rest;
 
     nDimensions = impact->getNDimensions();
-    vars = new float[nDimensions-1];
-    minRanges = new int [nDimensions-1];
-    maxRanges = new int [nDimensions-1];
-    samples = impact->getPercentage() * N_SAMPLES;
+    //vars = new float[nDimensions-1];
+    //minRanges = new int [nDimensions-1];
+    //maxRanges = new int [nDimensions-1];
+    samples = (int) (impact->getPercentage() * N_SAMPLES);
 
     for (int i = 0; i < nDimensions-1; i++) {
-        minRanges[i] = impact->getMinRange(i);
-        maxRanges[i] = impact->getMaxRange(i);
+        minRanges[i] = (int) impact->getMinRange(i);
+        maxRanges[i] = (int) impact->getMaxRange(i);
     }
 
-    samplingIntervalX = (maxRanges[0] - minRanges[0]) / sqrt(samples);
-    samplingIntervalY = (maxRanges[1] - minRanges[1]) / sqrt(samples);
+    samplingIntervalX = (float) ((maxRanges[0] - minRanges[0]) / sqrt(samples));
+    samplingIntervalY = (float) ((maxRanges[1] - minRanges[1]) / sqrt(samples));
 
     samplesPerRow = floor(sqrt(samples));
     rest = samples - (samplesPerRow*samplesPerRow);
@@ -198,20 +200,13 @@ void generate_samples(ImpactFunction *impact, int impactId, sqlite3 *db) {
             add_sample(vars[0], vars[1], impact->computeOutput(vars), impactId, db);
         }
     }
-    srand(time(NULL));
+    srand((unsigned int) time(NULL));
     for (int i = 0; i < rest; i++) {
         vars[0] = minRanges[0] + rand() % (maxRanges[0] - minRanges[0]);
         vars[1] = minRanges[1] + rand() % (maxRanges[1] - minRanges[1]);
 
         add_sample(vars[0], vars[1], impact->computeOutput(vars), impactId, db);
     }
-
-    free(vars);
-    free(minRanges);
-    free(maxRanges);
-    /*delete[] vars;
-    delete[] minRanges;
-    delete[] maxRanges;*/
 }
 
 int init_db (std::string file) {

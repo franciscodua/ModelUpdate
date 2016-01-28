@@ -6,16 +6,23 @@
 #define MODELUPDATE_IMPACTFUNCTION_H
 
 
+#include <vector>
+
 class ImpactFunction {
+/*
+ * Class represents impact function.
+ * It has the function's properties and computes the output based on the input
+ */
 private:
     float _percentage;
     int _nDimensions;
-    float *_weights;
-    float *_minRange;
-    float *_maxRange;
+    std::vector<float> _weights;
+    std::vector<float> _minRange;
+    std::vector<float> _maxRange;
 
 public:
-    ImpactFunction(float percentage, int nDimensions, float *weights, float *minRange, float *maxRange);
+    ImpactFunction(float percentage, int nDimensions, std::vector<float> weights,
+                   std::vector<float> minRange, std::vector<float> maxRange);
 
     float getPercentage() const {
         return _percentage;
@@ -25,23 +32,19 @@ public:
         return _nDimensions;
     }
 
-    float *getWeights() const {
-        return _weights;
-    }
-
     float getWeight(int dimension) {
-        return this->_weights[dimension];
+        return this->_weights.at(dimension);
     }
 
     float getMinRange(int dimension) {
-        return this->_minRange[dimension];
+        return this->_minRange.at(dimension);
     }
 
     float getMaxRange(int dimension) {
-        return this->_maxRange[dimension];
+        return this->_maxRange.at(dimension);
     }
 
-    float computeOutput(float *variables);
+    float computeOutput(std::vector<float> variables);
 };
 
 

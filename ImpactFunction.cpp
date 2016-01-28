@@ -13,19 +13,20 @@ float *copyArray(float *array, int size) {
     return res;
 }
 
-ImpactFunction::ImpactFunction(float percentage, int nDimensions, float *weights, float *minRange, float *maxRange) {
+ImpactFunction::ImpactFunction(float percentage, int nDimensions, std::vector<float> weights,
+                               std::vector<float> minRange, std::vector<float> maxRange) {
     this->_percentage = percentage;
     this->_nDimensions = nDimensions;
-    this->_weights = copyArray(weights, nDimensions - 1);
-    this->_minRange = copyArray(minRange, nDimensions - 1);
-    this->_maxRange = copyArray(maxRange, nDimensions - 1);
+    this->_weights = weights;
+    this->_minRange = minRange;
+    this->_maxRange = maxRange;
 }
 
-float ImpactFunction::computeOutput(float *variables) {
+float ImpactFunction::computeOutput(std::vector<float> variables) {
     float result = 0;
     int size;
 
-    size = sizeof(variables)/sizeof(variables[0]);
+    size = (int) variables.size();
 
     for (int i = 0; i < size; i++) {
         result += variables[i] * getWeight(i);
