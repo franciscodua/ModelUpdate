@@ -8,40 +8,40 @@
 
 class ImpactFunction {
 private:
-    int percentage;
-    int nDimensions;
-    int *weights;
-    int *minRange;
-    int *maxRange;
+    float _percentage;
+    int _nDimensions;
+    float *_weights;
+    float *_minRange;
+    float *_maxRange;
 
 public:
-    ImpactFunction(int percentage, int nDimensions, int *weights, int *minRange, int *maxRange);
+    ImpactFunction(float percentage, int nDimensions, float *weights, float *minRange, float *maxRange);
 
-    int getPercentage() const {
-        return percentage;
+    float getPercentage() const {
+        return _percentage;
     }
 
     int getNDimensions() const {
-        return nDimensions;
+        return _nDimensions;
     }
 
-    int *getWeights() const {
-        return weights;
+    float *getWeights() const {
+        return _weights;
     }
 
-    int getWeight(int dimension) {
-        return this->weights[dimension];
+    float getWeight(int dimension) {
+        return this->_weights[dimension];
     }
 
-    int getMinRange(int dimension) {
-        return this->minRange[dimension];
+    float getMinRange(int dimension) {
+        return this->_minRange[dimension];
     }
 
-    int getMaxRange(int dimension) {
-        return this->maxRange[dimension];
+    float getMaxRange(int dimension) {
+        return this->_maxRange[dimension];
     }
 
-    int computeOutput(int *variables);
+    float computeOutput(float *variables);
 };
 
 

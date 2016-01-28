@@ -7,6 +7,9 @@
 #include <sqlite3.h>
 #include <iostream>
 #include "bootstrap.h"
+#include <cmath>
+
+#define N_SAMPLES 100
 
 int drop_tables(sqlite3 *db) {
     int rCode;
@@ -44,9 +47,9 @@ int create_tables(sqlite3 *db) {
     char *errMsg;
 
     sqlCreateSamples =    "CREATE TABLE Samples ("
-            "RspTime INT    NOT NULL,"
-            "Resources INT  NOT NULL,"
-            "NewRspTime INT NOT NULL,"
+            "RspTime REAL    NOT NULL,"
+            "Resources REAL  NOT NULL,"
+            "NewRspTime REAL NOT NULL,"
             "Impact INT     NOT NULL,"
             "FOREIGN KEY(Impact) REFERENCES Impact_Functions(ImpactId));";
 
@@ -61,12 +64,12 @@ int create_tables(sqlite3 *db) {
 
     sqlCreateImpact = "CREATE TABLE Impact_Functions("
             "ImpactId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"
-            "weightRspTime INT NOT NULL,"
-            "weightResources INT NOT NULL,"
-            "minRangeRspTime INT NOT NULL,"
-            "maxRangeRspTime INT NOT NULL,"
-            "minRangeResources INT NOT NULL,"
-            "maxRangeResources INT NOT NULL)";
+            "weightRspTime REAL NOT NULL,"
+            "weightResources REAL NOT NULL,"
+            "minRangeRspTime REAL NOT NULL,"
+            "maxRangeRspTime REAL NOT NULL,"
+            "minRangeResources REAL NOT NULL,"
+            "maxRangeResources REAL NOT NULL)";
 
     rCode = sqlite3_exec(db, sqlCreateImpact, NULL, NULL, &errMsg);
 
@@ -85,9 +88,9 @@ int add_impact_function(ImpactFunction *impact, sqlite3 *db) {
     std::string sqlInsert;
     sqlite3_stmt *stmt;
     int rCode;
-    int weightRspTime, weightResources;
-    int minRangeRspTime, maxRangeRspTime;
-    int minRangeResources, maxRangeResources;
+    float weightRspTime, weightResources;
+    float minRangeRspTime, maxRangeRspTime;
+    float minRangeResources, maxRangeResources;
 
     sqlInsert = "INSERT INTO Impact_Functions"
             "(weightRspTime, weightResources, minRangeRspTime, maxRangeRspTime, minRangeResources, maxRangeResources)"
@@ -102,18 +105,18 @@ int add_impact_function(ImpactFunction *impact, sqlite3 *db) {
 
     weightRspTime = impact->getWeight(0);
     weightResources = impact->getWeight(1);
-    sqlite3_bind_int(stmt, 1, weightRspTime);
-    sqlite3_bind_int(stmt, 2, weightResources);
+    sqlite3_bind_double(stmt, 1, weightRspTime);
+    sqlite3_bind_double(stmt, 2, weightResources);
 
     minRangeRspTime = impact->getMinRange(0);
     maxRangeRspTime = impact->getMaxRange(0);
-    sqlite3_bind_int(stmt, 3, minRangeRspTime);
-    sqlite3_bind_int(stmt, 4, maxRangeRspTime);
+    sqlite3_bind_double(stmt, 3, minRangeRspTime);
+    sqlite3_bind_double(stmt, 4, maxRangeRspTime);
 
     minRangeResources = impact->getMinRange(1);
     maxRangeResources = impact->getMaxRange(1);
-    sqlite3_bind_int(stmt, 5, minRangeResources);
-    sqlite3_bind_int(stmt, 6, maxRangeResources);
+    sqlite3_bind_double(stmt, 5, minRangeResources);
+    sqlite3_bind_double(stmt, 6, maxRangeResources);
 
     rCode = sqlite3_step(stmt);
 
@@ -128,12 +131,12 @@ int add_impact_function(ImpactFunction *impact, sqlite3 *db) {
     return (int) sqlite3_last_insert_rowid(db);
 }
 
-void add_sample(int rspTime, int resources, int newRspTime, int impactId, sqlite3 *db) {
+void add_sample(float rspTime, float resources, float newRspTime, int impactId, sqlite3 *db) {
     std::string sqlInsert;
     sqlite3_stmt *stmt;
     int rCode;
 
-    sqlInsert = "INSERT INTO Samples"
+    sqlInsert = "INSERT INTO Samples VALUES"
             "(?, ?, ?, ?);";
 
     rCode = sqlite3_prepare(db, sqlInsert.c_str(), -1, &stmt, 0);
@@ -143,9 +146,9 @@ void add_sample(int rspTime, int resources, int newRspTime, int impactId, sqlite
         return;
     }
 
-    sqlite3_bind_int(stmt, 1, rspTime);
-    sqlite3_bind_int(stmt, 2, resources);
-    sqlite3_bind_int(stmt, 3, newRspTime);
+    sqlite3_bind_double(stmt, 1, rspTime);
+    sqlite3_bind_double(stmt, 2, resources);
+    sqlite3_bind_double(stmt, 3, newRspTime);
     sqlite3_bind_int(stmt, 4, impactId);
 
     rCode = sqlite3_step(stmt);
@@ -155,9 +158,60 @@ void add_sample(int rspTime, int resources, int newRspTime, int impactId, sqlite
         return;
     }
 
+    std::cout << "Sample generated: (" << rspTime << ", " << resources << ", " << newRspTime
+    << ", " << impactId << ")" << std::endl;
+
     sqlite3_finalize(stmt);
 
     return;
+}
+
+void generate_samples(ImpactFunction *impact, int impactId, sqlite3 *db) {
+    int nDimensions;
+    int samples, samplesPerRow;
+    float samplingIntervalX, samplingIntervalY;
+    float *vars;
+    int *minRanges, *maxRanges;
+    int rest;
+
+    nDimensions = impact->getNDimensions();
+    vars = new float[nDimensions-1];
+    minRanges = new int [nDimensions-1];
+    maxRanges = new int [nDimensions-1];
+    samples = impact->getPercentage() * N_SAMPLES;
+
+    for (int i = 0; i < nDimensions-1; i++) {
+        minRanges[i] = impact->getMinRange(i);
+        maxRanges[i] = impact->getMaxRange(i);
+    }
+
+    samplingIntervalX = (maxRanges[0] - minRanges[0]) / sqrt(samples);
+    samplingIntervalY = (maxRanges[1] - minRanges[1]) / sqrt(samples);
+
+    samplesPerRow = floor(sqrt(samples));
+    rest = samples - (samplesPerRow*samplesPerRow);
+
+    for (int x = 0; x < samplesPerRow; x++) {
+        for (int y = 0; y < samplesPerRow; y++) {
+            vars[0] = x * samplingIntervalX;
+            vars[1] = y * samplingIntervalY;
+            add_sample(vars[0], vars[1], impact->computeOutput(vars), impactId, db);
+        }
+    }
+    srand(time(NULL));
+    for (int i = 0; i < rest; i++) {
+        vars[0] = minRanges[0] + rand() % (maxRanges[0] - minRanges[0]);
+        vars[1] = minRanges[1] + rand() % (maxRanges[1] - minRanges[1]);
+
+        add_sample(vars[0], vars[1], impact->computeOutput(vars), impactId, db);
+    }
+
+    free(vars);
+    free(minRanges);
+    free(maxRanges);
+    /*delete[] vars;
+    delete[] minRanges;
+    delete[] maxRanges;*/
 }
 
 int init_db (std::string file) {
@@ -197,5 +251,5 @@ void generate_synthetic (ImpactFunction *impact, std::string file) {
 
     impactID = add_impact_function(impact, db);
 
-
+    generate_samples(impact, impactID, db);
 }
