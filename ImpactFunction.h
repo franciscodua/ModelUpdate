@@ -21,8 +21,14 @@ private:
     std::vector<float> _maxRange;
 
 public:
-    ImpactFunction(float percentage, int nDimensions, std::vector<float> weights,
-                   std::vector<float> minRange, std::vector<float> maxRange);
+
+    ImpactFunction(float _percentage, int _nDimensions, const std::vector<float> &_weights,
+                   const std::vector<float> &_minRange, const std::vector<float> &_maxRange) : _percentage(_percentage),
+                                                                                               _nDimensions(
+                                                                                                       _nDimensions),
+                                                                                               _weights(_weights),
+                                                                                               _minRange(_minRange),
+                                                                                               _maxRange(_maxRange) { }
 
     float getPercentage() const {
         return _percentage;
