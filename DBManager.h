@@ -8,6 +8,7 @@
 #include<string>
 #include <sqlite3.h>
 #include "ImpactFunction.h"
+#include "Sample.h"
 
 class DBManager {
 private:
@@ -18,12 +19,14 @@ public:
     DBManager(std::string fileName);
     ~DBManager();
 
+    int init_db();
+
     int create_tables();
     int drop_tables();
 
     int add_impact_function(ImpactFunction impact);
 
-
+    int add_sample(Sample sample);
 };
 
 

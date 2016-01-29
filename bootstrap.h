@@ -7,8 +7,8 @@
 
 #include <string>
 #include "ImpactFunction.h"
+#include "DBManager.h"
 
-int init_db(std::string file);
-void generate_synthetic (ImpactFunction *impact, std::string file);
+void generate_synthetic (ImpactFunction impact, DBManager *dbManager);
 
 #endif //MODELUPDATE_BOOTSTRAP_H

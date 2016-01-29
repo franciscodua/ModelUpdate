@@ -36,6 +36,18 @@ public:
     int get_impactId() const {
         return _impactId;
     }
+
+    void set_rspTime(float _rspTime) {
+        Sample::_rspTime = _rspTime;
+    }
+
+    void set_resources(float _resources) {
+        Sample::_resources = _resources;
+    }
+
+    void set_newRspTime(float _newRspTime) {
+        Sample::_newRspTime = _newRspTime;
+    }
 };
 
 
