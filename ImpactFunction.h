@@ -50,6 +50,11 @@ public:
         return this->_maxRange.at(dimension);
     }
 
+    /*
+     * Computes expected outcome of sample based on impact function.
+     * Receives a vector of variables values.
+     * Returns w1*v1 + w2*v2 + ... + wn*vn
+     */
     float computeOutput(std::vector<float> variables);
 };
 

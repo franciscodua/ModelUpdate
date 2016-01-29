@@ -10,7 +10,7 @@
 
 DBManager::DBManager(std::string fileName): _fileName(fileName) {
     int rCode;
-
+    // opens connection to SQLite database
     rCode = sqlite3_open(_fileName.c_str(), &_db);
 
     if(rCode != SQLITE_OK) {
@@ -24,10 +24,12 @@ DBManager::~DBManager() {
 }
 
 int DBManager::init_db() {
+    // drop tables if exists
     if (drop_tables()) {
         return DBMANAGER_ERR;
     }
 
+    // create new tables Samples and Impact_Functions
     if (create_tables()) {
         return DBMANAGER_ERR;
     }
@@ -126,18 +128,18 @@ int DBManager::add_impact_function(ImpactFunction impact) {
         return DBMANAGER_ERR;
     }
 
+    // this could be squashed
     weightRspTime = impact.getWeight(0);
     weightResources = impact.getWeight(1);
-    sqlite3_bind_double(stmt, 1, weightRspTime);
-    sqlite3_bind_double(stmt, 2, weightResources);
-
     minRangeRspTime = impact.getMinRange(0);
     maxRangeRspTime = impact.getMaxRange(0);
-    sqlite3_bind_double(stmt, 3, minRangeRspTime);
-    sqlite3_bind_double(stmt, 4, maxRangeRspTime);
-
     minRangeResources = impact.getMinRange(1);
     maxRangeResources = impact.getMaxRange(1);
+
+    sqlite3_bind_double(stmt, 1, weightRspTime);
+    sqlite3_bind_double(stmt, 2, weightResources);
+    sqlite3_bind_double(stmt, 3, minRangeRspTime);
+    sqlite3_bind_double(stmt, 4, maxRangeRspTime);
     sqlite3_bind_double(stmt, 5, minRangeResources);
     sqlite3_bind_double(stmt, 6, maxRangeResources);
 
@@ -171,6 +173,7 @@ int DBManager::add_sample(Sample sample) {
         return DBMANAGER_ERR;
     }
 
+    // this could be squashed but is used in print
     rspTime = sample.get_rspTime();
     resources = sample.get_resources();
     newRspTime = sample.get_newRspTime();

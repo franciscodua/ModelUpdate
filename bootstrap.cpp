@@ -10,6 +10,9 @@
 
 #define N_SAMPLES 100
 
+/*
+ * Generates samples from impact function and inserts them in database.
+ */
 void generate_samples(ImpactFunction impact, int impactId, DBManager *dbManager) {
     int nDimensions;
     int samples, samplesPerRow;
@@ -22,6 +25,7 @@ void generate_samples(ImpactFunction impact, int impactId, DBManager *dbManager)
     Sample *sample;
 
     nDimensions = impact.getNDimensions();
+    // number of samples to be generated. Probability times constant
     samples = (int) (impact.getPercentage() * N_SAMPLES);
 
     for (int i = 0; i < nDimensions-1; i++) {
@@ -29,6 +33,8 @@ void generate_samples(ImpactFunction impact, int impactId, DBManager *dbManager)
         maxRanges[i] = (int) impact.getMaxRange(i);
     }
 
+    // sampling intervals: delta range divided by number of points per row
+    // assuming squared space
     samplingIntervalX = (float) ((maxRanges[0] - minRanges[0]) / ceil(sqrt(samples)));
     samplingIntervalY = (float) ((maxRanges[1] - minRanges[1]) / ceil(sqrt(samples)));
 
@@ -37,6 +43,7 @@ void generate_samples(ImpactFunction impact, int impactId, DBManager *dbManager)
 
     sample = new Sample(0, 0, 0, impactId);
 
+    // generates samples. floor * floor <= samples
     for (int x = 0; x < samplesPerRow; x++) {
         for (int y = 0; y < samplesPerRow; y++) {
             vars[0] = minRanges[0] + (x * samplingIntervalX) + (samplingIntervalX / 2);
@@ -50,6 +57,7 @@ void generate_samples(ImpactFunction impact, int impactId, DBManager *dbManager)
         }
     }
 
+    // remaining samples are added to the last column and last row (half each)
     restRow =(int) floor(rest / 2);
     restCol = rest - restRow;
 
@@ -81,7 +89,7 @@ void generate_samples(ImpactFunction impact, int impactId, DBManager *dbManager)
 
 void generate_synthetic (ImpactFunction impact, DBManager *dbManager) {
     int impactId;
-
+    // adds function to table
     impactId = dbManager->add_impact_function(impact);
 
     generate_samples(impact, impactId, dbManager);

@@ -9,6 +9,9 @@
 #include "ImpactFunction.h"
 #include "DBManager.h"
 
+/*
+ * Receives impact function inserts it in Impact_Functions, generates samples from it and adds them to database
+ */
 void generate_synthetic (ImpactFunction impact, DBManager *dbManager);
 
 #endif //MODELUPDATE_BOOTSTRAP_H

@@ -7,6 +7,9 @@
 
 
 class Sample {
+    /*
+     * Represents samples details. Container.
+     */
 private:
     float _rspTime;
     float _resources;
