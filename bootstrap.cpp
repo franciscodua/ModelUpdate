@@ -17,8 +17,8 @@ void generate_samples(ImpactFunction impact, int impactId, DBManager *dbManager)
     std::vector<float> vars (2);
     std::vector<int> minRanges(2);
     std::vector<int> maxRanges(2);
-    int rest;
-    int samplingLastCol;
+    int rest, restCol, restRow;
+    int samplingLastCol, samplingLastRow;
     Sample *sample;
 
     nDimensions = impact.getNDimensions();
@@ -29,8 +29,8 @@ void generate_samples(ImpactFunction impact, int impactId, DBManager *dbManager)
         maxRanges[i] = (int) impact.getMaxRange(i);
     }
 
-    samplingIntervalX = (float) ((maxRanges[0] - minRanges[0]) / floor(sqrt(samples)));
-    samplingIntervalY = (float) ((maxRanges[1] - minRanges[1]) / floor(sqrt(samples)));
+    samplingIntervalX = (float) ((maxRanges[0] - minRanges[0]) / ceil(sqrt(samples)));
+    samplingIntervalY = (float) ((maxRanges[1] - minRanges[1]) / ceil(sqrt(samples)));
 
     samplesPerRow = (int) floor(sqrt(samples));
     rest = samples - (samplesPerRow*samplesPerRow);
@@ -50,12 +50,27 @@ void generate_samples(ImpactFunction impact, int impactId, DBManager *dbManager)
         }
     }
 
-    samplingLastCol = (maxRanges[1] - minRanges[1]) / rest;
+    restRow =(int) floor(rest / 2);
+    restCol = rest - restRow;
+
+    samplingLastRow = (maxRanges[0] - minRanges[0]) / restRow;
+    samplingLastCol = (maxRanges[1] - minRanges[1]) / restCol;
+
     vars[0] = samplesPerRow * samplingIntervalX;
     sample->set_rspTime(vars[0]);
-    for (int i = 0; i < rest; i++) {
-        vars[1] = minRanges[0] + (i * samplingLastCol) + (samplingLastCol / 2);
+    for (int i = 0; i < restRow; i++) {
+        vars[1] = minRanges[1] + (i * samplingLastRow) + (samplingLastRow / 2);
         sample->set_resources(vars[1]);
+        sample->set_newRspTime(impact.computeOutput(vars));
+
+        dbManager->add_sample(*sample);
+    }
+
+    vars[1] = samplesPerRow * samplingIntervalY;
+    sample->set_resources(vars[1]);
+    for (int i = 0; i < restRow; i++) {
+        vars[0] = minRanges[0] + (i * samplingLastCol) + (samplingLastCol / 2);
+        sample->set_rspTime(vars[0]);
         sample->set_newRspTime(impact.computeOutput(vars));
 
         dbManager->add_sample(*sample);
