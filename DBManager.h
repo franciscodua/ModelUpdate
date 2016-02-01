@@ -21,8 +21,8 @@ private:
     std::string _fileName;
     sqlite3 *_db;
 
-    int create_tables();
-    int drop_tables();
+    int createTables();
+    int dropTables();
 
 public:
     DBManager(std::string fileName);
@@ -34,7 +34,7 @@ public:
      * Samples and Impact_Functions.
      * Returns DBMANAGER_ERR if unsuccessful and DBMANAGER_OK otherwise
      */
-    int init_db();
+    int initDb();
 
     /*
      * Adds impact function details to table Impact_Functions.
@@ -46,20 +46,20 @@ public:
      * Receives impact which should have the details of an impact function
      * Returns DBMANAGER_ERR if unsuccessful and ImpactId otherwise
      */
-    int add_impact_function(ImpactFunction impact);
+    int addImpactFunction(ImpactFunction impact);
 
     /*
      * Adds sample details to table Samples.
      *
-     *  _________________________________________________________
-     *  |   RspTime |   Resources   |   NewRspTime  |   Impact  |
-     *  \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-     *  | REAL      | REAL          | REAL          | INT       |
+     *  _________________________________________________________________________
+     *  |   SampleId    |   RspTime |   Resources   |   NewRspTime  |   Impact  |
+     *  \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+     *  | INT           | REAL      | REAL          | REAL          | INT       |
      *
      * Receives sample which should have the details of a sample.
      * Returns DBMANAGER_ERR if unsuccessful and DBMANAGER_OK otherwise
      */
-    int add_sample(Sample sample);
+    int addSample(Sample sample);
 };
 
 

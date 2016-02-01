@@ -23,26 +23,28 @@ DBManager::~DBManager() {
     sqlite3_close(_db);
 }
 
-int DBManager::init_db() {
+int DBManager::initDb() {
     // drop tables if exists
-    if (drop_tables()) {
+    if (dropTables()) {
         return DBMANAGER_ERR;
     }
 
     // create new tables Samples and Impact_Functions
-    if (create_tables()) {
+    if (createTables()) {
         return DBMANAGER_ERR;
     }
     return DBMANAGER_OK;
 }
 
-int DBManager::create_tables() {
+int DBManager::createTables() {
     int rCode;
     const char* sqlCreateSamples;
     const char* sqlCreateImpact;
+    const char* sqlInsertNoFunc;
     char *errMsg;
 
     sqlCreateSamples =    "CREATE TABLE Samples ("
+            "SampleId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"
             "RspTime REAL    NOT NULL,"
             "Resources REAL  NOT NULL,"
             "NewRspTime REAL NOT NULL,"
@@ -75,12 +77,25 @@ int DBManager::create_tables() {
         return DBMANAGER_ERR;
     }
 
+    // No Impact Function
+    sqlInsertNoFunc = "INSERT INTO Impact_Functions("
+            "(weightRspTime, weightResources, minRangeRspTime, maxRangeRspTime, minRangeResources, maxRangeResources)"
+            "VALUES (0, 0, 0, 0, 0, 0);";
+
+    rCode = sqlite3_exec(_db, sqlInsertNoFunc, NULL, NULL, &errMsg);
+
+    if (rCode != SQLITE_OK) {
+        fprintf(stderr, "SQL error: %s\n", errMsg);
+        sqlite3_free(errMsg);
+        return DBMANAGER_ERR;
+    }
+
     std::cout << "SQL: Impact_Functions Created" << std::endl;
 
     return DBMANAGER_OK;
 }
 
-int DBManager::drop_tables() {
+int DBManager::dropTables() {
     int rCode;
     const char *sqlDropSamples, *sqlDropImpact;
     char *errMsg;
@@ -109,7 +124,7 @@ int DBManager::drop_tables() {
     return DBMANAGER_OK;
 }
 
-int DBManager::add_impact_function(ImpactFunction impact) {
+int DBManager::addImpactFunction(ImpactFunction impact) {
     std::string sqlInsert;
     sqlite3_stmt *stmt;
     int rCode;
@@ -156,15 +171,16 @@ int DBManager::add_impact_function(ImpactFunction impact) {
     return (int) sqlite3_last_insert_rowid(_db);
 }
 
-int DBManager::add_sample(Sample sample) {
+int DBManager::addSample(Sample sample) {
     std::string sqlInsert;
     sqlite3_stmt *stmt;
     int rCode;
     float rspTime, resources, newRspTime;
     int impactId;
 
-    sqlInsert = "INSERT INTO Samples VALUES"
-            "(?, ?, ?, ?);";
+    sqlInsert = "INSERT INTO Samples"
+            "(RspTime, Resources, NewRspTime, Impact)"
+            "VALUES (?, ?, ?, ?);";
 
     rCode = sqlite3_prepare(_db, sqlInsert.c_str(), -1, &stmt, 0);
 
@@ -174,10 +190,10 @@ int DBManager::add_sample(Sample sample) {
     }
 
     // this could be squashed but is used in print
-    rspTime = sample.get_rspTime();
-    resources = sample.get_resources();
-    newRspTime = sample.get_newRspTime();
-    impactId = sample.get_impactId();
+    rspTime = sample.getRspTime();
+    resources = sample.getResources();
+    newRspTime = sample.getNewRspTime();
+    impactId = sample.getImpactId();
 
     sqlite3_bind_double(stmt, 1, rspTime);
     sqlite3_bind_double(stmt, 2, resources);

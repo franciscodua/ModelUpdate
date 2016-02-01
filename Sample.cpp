@@ -3,3 +3,7 @@
 //
 
 #include "Sample.h"
+
+std::vector<float> Sample::getVariables() {
+    return std::vector<float>(getRspTime(), getResources());
+}

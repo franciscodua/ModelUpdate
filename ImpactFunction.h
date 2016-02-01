@@ -5,8 +5,9 @@
 #ifndef MODELUPDATE_IMPACTFUNCTION_H
 #define MODELUPDATE_IMPACTFUNCTION_H
 
-
+#include <cmath>
 #include <vector>
+#include "Sample.h"
 
 class ImpactFunction {
 /*
@@ -14,7 +15,8 @@ class ImpactFunction {
  * It has the function's properties and computes the output based on the input
  */
 private:
-    float _percentage;
+    int _impactId;
+    float _probability;
     int _nDimensions;
     std::vector<float> _weights;
     std::vector<float> _minRange;
@@ -23,15 +25,29 @@ private:
 public:
 
     ImpactFunction(float _percentage, int _nDimensions, const std::vector<float> &_weights,
-                   const std::vector<float> &_minRange, const std::vector<float> &_maxRange) : _percentage(_percentage),
+                   const std::vector<float> &_minRange, const std::vector<float> &_maxRange) : _probability(_percentage),
                                                                                                _nDimensions(
                                                                                                        _nDimensions),
                                                                                                _weights(_weights),
                                                                                                _minRange(_minRange),
                                                                                                _maxRange(_maxRange) { }
 
-    float getPercentage() const {
-        return _percentage;
+
+    ImpactFunction(int _impactId, float _percentage, int _nDimensions, const std::vector<float> &_weights,
+                   const std::vector<float> &_minRange, const std::vector<float> &_maxRange) : _impactId(_impactId),
+                                                                                               _probability(_percentage),
+                                                                                               _nDimensions(
+                                                                                                       _nDimensions),
+                                                                                               _weights(_weights),
+                                                                                               _minRange(_minRange),
+                                                                                               _maxRange(_maxRange) { }
+
+    int getImpactId() const {
+        return _impactId;
+    }
+
+    float getProbability() const {
+        return _probability;
     }
 
     int getNDimensions() const {
@@ -56,6 +72,8 @@ public:
      * Returns w1*v1 + w2*v2 + ... + wn*vn
      */
     float computeOutput(std::vector<float> variables);
+
+    float computeError(Sample sample);
 };
 
 

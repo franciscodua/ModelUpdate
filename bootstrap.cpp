@@ -6,7 +6,6 @@
 #include <string>
 #include <iostream>
 #include "bootstrap.h"
-#include <cmath>
 
 #define N_SAMPLES 100
 
@@ -26,7 +25,7 @@ void generate_samples(ImpactFunction impact, int impactId, DBManager *dbManager)
 
     nDimensions = impact.getNDimensions();
     // number of samples to be generated. Probability times constant
-    samples = (int) (impact.getPercentage() * N_SAMPLES);
+    samples = (int) (impact.getProbability() * N_SAMPLES);
 
     for (int i = 0; i < nDimensions-1; i++) {
         minRanges[i] = (int) impact.getMinRange(i);
@@ -49,11 +48,11 @@ void generate_samples(ImpactFunction impact, int impactId, DBManager *dbManager)
             vars[0] = minRanges[0] + (x * samplingIntervalX) + (samplingIntervalX / 2);
             vars[1] = minRanges[1] + (y * samplingIntervalY) + (samplingIntervalX / 2);
 
-            sample->set_rspTime(vars[0]);
-            sample->set_resources(vars[1]);
-            sample->set_newRspTime(impact.computeOutput(vars));
+            sample->setRspTime(vars[0]);
+            sample->setResources(vars[1]);
+            sample->setNewRspTime(impact.computeOutput(vars));
 
-            dbManager->add_sample(*sample);
+            dbManager->addSample(*sample);
         }
     }
 
@@ -65,32 +64,32 @@ void generate_samples(ImpactFunction impact, int impactId, DBManager *dbManager)
     samplingLastCol = (maxRanges[1] - minRanges[1]) / restCol;
 
     vars[0] = samplesPerRow * samplingIntervalX;
-    sample->set_rspTime(vars[0]);
+    sample->setRspTime(vars[0]);
     for (int i = 0; i < restRow; i++) {
         vars[1] = minRanges[1] + (i * samplingLastRow) + (samplingLastRow / 2);
-        sample->set_resources(vars[1]);
-        sample->set_newRspTime(impact.computeOutput(vars));
+        sample->setResources(vars[1]);
+        sample->setNewRspTime(impact.computeOutput(vars));
 
-        dbManager->add_sample(*sample);
+        dbManager->addSample(*sample);
     }
 
     vars[1] = samplesPerRow * samplingIntervalY;
-    sample->set_resources(vars[1]);
+    sample->setResources(vars[1]);
     for (int i = 0; i < restRow; i++) {
         vars[0] = minRanges[0] + (i * samplingLastCol) + (samplingLastCol / 2);
-        sample->set_rspTime(vars[0]);
-        sample->set_newRspTime(impact.computeOutput(vars));
+        sample->setRspTime(vars[0]);
+        sample->setNewRspTime(impact.computeOutput(vars));
 
-        dbManager->add_sample(*sample);
+        dbManager->addSample(*sample);
     }
     delete(sample);
 }
 
 
-void generate_synthetic (ImpactFunction impact, DBManager *dbManager) {
+void generateSynthetic(ImpactFunction impact, DBManager *dbManager) {
     int impactId;
     // adds function to table
-    impactId = dbManager->add_impact_function(impact);
+    impactId = dbManager->addImpactFunction(impact);
 
     generate_samples(impact, impactId, dbManager);
 }

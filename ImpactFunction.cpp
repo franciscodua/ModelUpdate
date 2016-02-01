@@ -16,3 +16,15 @@ float ImpactFunction::computeOutput(std::vector<float> variables) {
 
     return result;
 }
+
+float ImpactFunction::computeError(Sample sample) {
+    float expectedOutcome;
+    float realOutcome;
+    std::vector<float> vars = sample.getVariables();
+
+    expectedOutcome = computeOutput(vars);
+
+    realOutcome = sample.getNewRspTime();
+
+    return std::abs(expectedOutcome - realOutcome);
+}

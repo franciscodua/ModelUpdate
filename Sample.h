@@ -6,11 +6,14 @@
 #define MODELUPDATE_SAMPLE_H
 
 
+#include <vector>
+
 class Sample {
     /*
      * Represents samples details. Container.
      */
 private:
+    int _sampleId;
     float _rspTime;
     float _resources;
     float _newRspTime;
@@ -24,33 +27,50 @@ public:
                                                                                  _impactId(_impactId) { }
 
 
-    float get_rspTime() const {
+    Sample(int _sampleId, float _rspTime, float _resources, float _newRspTime, int _impactId) : _sampleId(_sampleId),
+                                                                                                _rspTime(_rspTime),
+                                                                                                _resources(_resources),
+                                                                                                _newRspTime(
+                                                                                                        _newRspTime),
+                                                                                                _impactId(_impactId) { }
+
+    Sample(float _rspTime, float _resources, float _newRspTime) : _rspTime(_rspTime), _resources(_resources),
+                                                                  _newRspTime(_newRspTime) { }
+
+
+    int getSampleId() const {
+        return _sampleId;
+    }
+
+    float getRspTime() const {
         return _rspTime;
     }
 
-    float get_resources() const {
+    float getResources() const {
         return _resources;
     }
 
-    float get_newRspTime() const {
+    float getNewRspTime() const {
         return _newRspTime;
     }
 
-    int get_impactId() const {
+    int getImpactId() const {
         return _impactId;
     }
 
-    void set_rspTime(float _rspTime) {
+    void setRspTime(float _rspTime) {
         Sample::_rspTime = _rspTime;
     }
 
-    void set_resources(float _resources) {
+    void setResources(float _resources) {
         Sample::_resources = _resources;
     }
 
-    void set_newRspTime(float _newRspTime) {
+    void setNewRspTime(float _newRspTime) {
         Sample::_newRspTime = _newRspTime;
     }
+
+    std::vector<float> getVariables();
 };
 
 
