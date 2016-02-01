@@ -24,8 +24,9 @@ private:
 
 public:
 
-    ImpactFunction(float _percentage, int _nDimensions, const std::vector<float> &_weights,
-                   const std::vector<float> &_minRange, const std::vector<float> &_maxRange) : _probability(_percentage),
+    ImpactFunction(float _probability, int _nDimensions, const std::vector<float> _weights,
+                   const std::vector<float> _minRange, const std::vector<float> _maxRange) : _probability(
+                                                                                                        _probability),
                                                                                                _nDimensions(
                                                                                                        _nDimensions),
                                                                                                _weights(_weights),
@@ -33,9 +34,10 @@ public:
                                                                                                _maxRange(_maxRange) { }
 
 
-    ImpactFunction(int _impactId, float _percentage, int _nDimensions, const std::vector<float> &_weights,
-                   const std::vector<float> &_minRange, const std::vector<float> &_maxRange) : _impactId(_impactId),
-                                                                                               _probability(_percentage),
+    ImpactFunction(int _impactId, float _probability, int _nDimensions, const std::vector<float> _weights,
+                   const std::vector<float> _minRange, const std::vector<float> _maxRange) : _impactId(_impactId),
+                                                                                               _probability(
+                                                                                                       _probability),
                                                                                                _nDimensions(
                                                                                                        _nDimensions),
                                                                                                _weights(_weights),
@@ -73,6 +75,10 @@ public:
      */
     float computeOutput(std::vector<float> variables);
 
+    /*
+     * Computes prediction error based on sample
+     * returns | expected - real |
+     */
     float computeError(Sample sample);
 };
 

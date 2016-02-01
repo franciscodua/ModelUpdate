@@ -2,14 +2,12 @@
 
 #include "bootstrap.h"
 
-using namespace std;
-
 int main() {
     std::vector<float> weights, minRange, maxRange;
     DBManager *dbManager;
     dbManager = new DBManager("/Users/francisco/Documents/Working-dir/ModelUpdate/db.sqlite");
 
-    cout << "Init DB:" << endl;
+    std::cout << "Init DB:" << std::endl;
     dbManager->initDb();
 
     weights = {2, 3};
@@ -19,6 +17,9 @@ int main() {
     ImpactFunction *impact = new ImpactFunction(0.8, 3, weights, minRange, maxRange);
 
     generateSynthetic(*impact, dbManager);
+
+    std::vector<ImpactFunction> impacts = dbManager->getImpactFunctions();
+
 
     delete(dbManager);
     delete(impact);

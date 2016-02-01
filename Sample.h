@@ -58,6 +58,10 @@ public:
         return _impactId;
     }
 
+    void set_impactId(int _impactId) {
+        Sample::_impactId = _impactId;
+    }
+
     void setRspTime(float _rspTime) {
         Sample::_rspTime = _rspTime;
     }

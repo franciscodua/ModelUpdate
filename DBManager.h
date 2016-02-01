@@ -60,6 +60,8 @@ public:
      * Returns DBMANAGER_ERR if unsuccessful and DBMANAGER_OK otherwise
      */
     int addSample(Sample sample);
+
+    std::vector<ImpactFunction> getImpactFunctions();
 };
 
 

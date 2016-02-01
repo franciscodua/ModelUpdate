@@ -62,12 +62,13 @@ int DBManager::createTables() {
 
     sqlCreateImpact = "CREATE TABLE Impact_Functions("
             "ImpactId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"
+            "probability REAL NOT NULL,"
             "weightRspTime REAL NOT NULL,"
             "weightResources REAL NOT NULL,"
             "minRangeRspTime REAL NOT NULL,"
             "maxRangeRspTime REAL NOT NULL,"
             "minRangeResources REAL NOT NULL,"
-            "maxRangeResources REAL NOT NULL)";
+            "maxRangeResources REAL NOT NULL);";
 
     rCode = sqlite3_exec(_db, sqlCreateImpact, NULL, NULL, &errMsg);
 
@@ -79,8 +80,9 @@ int DBManager::createTables() {
 
     // No Impact Function
     sqlInsertNoFunc = "INSERT INTO Impact_Functions("
-            "(weightRspTime, weightResources, minRangeRspTime, maxRangeRspTime, minRangeResources, maxRangeResources)"
-            "VALUES (0, 0, 0, 0, 0, 0);";
+            "probability, weightRspTime, weightResources, minRangeRspTime, maxRangeRspTime, minRangeResources,"
+            "maxRangeResources)"
+            "VALUES (0, 0, 0, 0, 0, 0, 0);";
 
     rCode = sqlite3_exec(_db, sqlInsertNoFunc, NULL, NULL, &errMsg);
 
@@ -128,13 +130,15 @@ int DBManager::addImpactFunction(ImpactFunction impact) {
     std::string sqlInsert;
     sqlite3_stmt *stmt;
     int rCode;
+    float probability;
     float weightRspTime, weightResources;
     float minRangeRspTime, maxRangeRspTime;
     float minRangeResources, maxRangeResources;
 
     sqlInsert = "INSERT INTO Impact_Functions"
-            "(weightRspTime, weightResources, minRangeRspTime, maxRangeRspTime, minRangeResources, maxRangeResources)"
-            "VALUES (?, ?, ?, ?, ?, ?);";
+            "(probability, weightRspTime, weightResources, minRangeRspTime, maxRangeRspTime, minRangeResources,"
+            "maxRangeResources)"
+            "VALUES (?, ?, ?, ?, ?, ?, ?);";
 
     rCode = sqlite3_prepare(_db, sqlInsert.c_str(), -1, &stmt, 0);
 
@@ -144,6 +148,7 @@ int DBManager::addImpactFunction(ImpactFunction impact) {
     }
 
     // this could be squashed
+    probability = impact.getProbability();
     weightRspTime = impact.getWeight(0);
     weightResources = impact.getWeight(1);
     minRangeRspTime = impact.getMinRange(0);
@@ -151,12 +156,13 @@ int DBManager::addImpactFunction(ImpactFunction impact) {
     minRangeResources = impact.getMinRange(1);
     maxRangeResources = impact.getMaxRange(1);
 
-    sqlite3_bind_double(stmt, 1, weightRspTime);
-    sqlite3_bind_double(stmt, 2, weightResources);
-    sqlite3_bind_double(stmt, 3, minRangeRspTime);
-    sqlite3_bind_double(stmt, 4, maxRangeRspTime);
-    sqlite3_bind_double(stmt, 5, minRangeResources);
-    sqlite3_bind_double(stmt, 6, maxRangeResources);
+    sqlite3_bind_double(stmt, 1, probability);
+    sqlite3_bind_double(stmt, 2, weightRspTime);
+    sqlite3_bind_double(stmt, 3, weightResources);
+    sqlite3_bind_double(stmt, 4, minRangeRspTime);
+    sqlite3_bind_double(stmt, 5, maxRangeRspTime);
+    sqlite3_bind_double(stmt, 6, minRangeResources);
+    sqlite3_bind_double(stmt, 7, maxRangeResources);
 
     rCode = sqlite3_step(stmt);
 
@@ -215,3 +221,55 @@ int DBManager::addSample(Sample sample) {
     return DBMANAGER_OK;
 }
 
+std::vector<ImpactFunction> DBManager::getImpactFunctions() {
+    std::vector<ImpactFunction> result;
+    const char *sqlSelect;
+    sqlite3_stmt *stmt;
+    int rCode;
+
+
+    // impact variables
+    int impactId;
+    float probability;
+    std::vector<float> *weights;
+    std::vector<float> *minRange;
+    std::vector<float> *maxRange;
+
+    sqlSelect = "SELECT * FROM Impact_Functions WHERE ImpactId > 1;";
+
+    result = std::vector<ImpactFunction>();
+    weights = new std::vector<float>(2);
+    minRange = new std::vector<float>(2);
+    maxRange = new std::vector<float>(2);
+
+    sqlite3_prepare(_db, sqlSelect, -1, &stmt, 0);
+
+    while(true) {
+        rCode = sqlite3_step(stmt);
+        if (rCode == SQLITE_ROW) {
+            impactId = sqlite3_column_int(stmt, 0);
+            probability = (float) sqlite3_column_double(stmt, 1);
+            weights->at(0) = (float) sqlite3_column_double(stmt, 2);
+            weights->at(1) = (float) sqlite3_column_double(stmt, 3);
+            minRange->at(0) = (float) sqlite3_column_double(stmt, 4);
+            maxRange->at(0) = (float) sqlite3_column_double(stmt, 5);
+            minRange->at(1) = (float) sqlite3_column_double(stmt, 6);
+            maxRange->at(1) = (float) sqlite3_column_double(stmt, 7);
+
+            result.insert(result.end(), ImpactFunction(impactId, probability, 3, *weights, *minRange, *maxRange));
+        }
+        else if (rCode == SQLITE_DONE) {
+            break;
+        }
+
+        else {
+            fprintf(stderr, "Could not step stmt: %s\n", sqlite3_errmsg(_db));
+            return std::vector<ImpactFunction>();;
+        }
+    }
+    delete(weights);
+    delete(minRange);
+    delete(maxRange);
+
+    return result;
+}
