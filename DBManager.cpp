@@ -49,6 +49,7 @@ int DBManager::createTables() {
             "Resources REAL  NOT NULL,"
             "NewRspTime REAL NOT NULL,"
             "Impact INT     NOT NULL,"
+            "Synthetic INT  NOT NULL,"
             "FOREIGN KEY(Impact) REFERENCES Impact_Functions(ImpactId));";
 
     rCode = sqlite3_exec(_db, sqlCreateSamples, NULL, NULL, &errMsg);
@@ -183,10 +184,11 @@ int DBManager::addSample(Sample sample) {
     int rCode;
     float rspTime, resources, newRspTime;
     int impactId;
+    int synthetic;
 
     sqlInsert = "INSERT INTO Samples"
-            "(RspTime, Resources, NewRspTime, Impact)"
-            "VALUES (?, ?, ?, ?);";
+            "(RspTime, Resources, NewRspTime, Impact, Synthetic)"
+            "VALUES (?, ?, ?, ?, ?);";
 
     rCode = sqlite3_prepare(_db, sqlInsert.c_str(), -1, &stmt, 0);
 
@@ -200,11 +202,13 @@ int DBManager::addSample(Sample sample) {
     resources = sample.getResources();
     newRspTime = sample.getNewRspTime();
     impactId = sample.getImpactId();
+    synthetic = (sample.getSynthetic())? 1 : 0;
 
     sqlite3_bind_double(stmt, 1, rspTime);
     sqlite3_bind_double(stmt, 2, resources);
     sqlite3_bind_double(stmt, 3, newRspTime);
     sqlite3_bind_int(stmt, 4, impactId);
+    sqlite3_bind_int(stmt, 5, synthetic);
 
     rCode = sqlite3_step(stmt);
 

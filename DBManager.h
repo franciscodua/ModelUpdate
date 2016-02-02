@@ -51,10 +51,10 @@ public:
     /*
      * Adds sample details to table Samples.
      *
-     *  _________________________________________________________________________
-     *  |   SampleId    |   RspTime |   Resources   |   NewRspTime  |   Impact  |
-     *  \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-     *  | INT           | REAL      | REAL          | REAL          | INT       |
+     *  _________________________________________________________________________________________
+     *  |   SampleId    |   RspTime |   Resources   |   NewRspTime  |   Impact  |   Synthetic   |
+     *  \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+     *  | INT           | REAL      | REAL          | REAL          | INT       | BOOL (INT)    |
      *
      * Receives sample which should have the details of a sample.
      * Returns DBMANAGER_ERR if unsuccessful and DBMANAGER_OK otherwise

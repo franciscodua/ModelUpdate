@@ -18,24 +18,30 @@ private:
     float _resources;
     float _newRspTime;
     int _impactId;
+    bool _synthetic;
 
 public:
 
-    Sample(float _rspTime, float _resources, float _newRspTime, int _impactId) : _rspTime(_rspTime),
+    Sample(float _rspTime, float _resources, float _newRspTime, int _impactId, bool synthetic) : _rspTime(_rspTime),
                                                                                  _resources(_resources),
                                                                                  _newRspTime(_newRspTime),
-                                                                                 _impactId(_impactId) { }
+                                                                                 _impactId(_impactId),
+                                                                                 _synthetic(synthetic){ }
 
 
-    Sample(int _sampleId, float _rspTime, float _resources, float _newRspTime, int _impactId) : _sampleId(_sampleId),
+    Sample(int _sampleId, float _rspTime, float _resources, float _newRspTime, int _impactId, bool synthetic) :
+                                                                                                _sampleId(_sampleId),
                                                                                                 _rspTime(_rspTime),
                                                                                                 _resources(_resources),
                                                                                                 _newRspTime(
                                                                                                         _newRspTime),
-                                                                                                _impactId(_impactId) { }
+                                                                                                _impactId(_impactId),
+                                                                                                _synthetic(synthetic){ }
 
-    Sample(float _rspTime, float _resources, float _newRspTime) : _rspTime(_rspTime), _resources(_resources),
-                                                                  _newRspTime(_newRspTime) { }
+    Sample(float _rspTime, float _resources, float _newRspTime, bool synthetic) : _rspTime(_rspTime),
+                                                                                  _resources(_resources),
+                                                                                  _newRspTime(_newRspTime),
+                                                                                  _synthetic(synthetic){ }
 
 
     int getSampleId() const {
@@ -58,6 +64,10 @@ public:
         return _impactId;
     }
 
+    bool getSynthetic() const {
+        return _synthetic;
+    }
+
     void set_impactId(int _impactId) {
         Sample::_impactId = _impactId;
     }
@@ -75,6 +85,7 @@ public:
     }
 
     std::vector<float> getVariables();
+
 };
 
 

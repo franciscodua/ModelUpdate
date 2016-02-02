@@ -12,6 +12,4 @@
 
 int assingFunctionToSample(Sample sample, DBManager *dbManager);
 
-void addRealSample(Sample sample)
-
 #endif //MODELUPDATE_UPDATE_H
