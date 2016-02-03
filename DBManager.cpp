@@ -66,6 +66,7 @@ int DBManager::createTables() {
             "probability REAL NOT NULL,"
             "weightRspTime REAL NOT NULL,"
             "weightResources REAL NOT NULL,"
+            "intersection REAL NOT NULL,"
             "minRangeRspTime REAL NOT NULL,"
             "maxRangeRspTime REAL NOT NULL,"
             "minRangeResources REAL NOT NULL,"
@@ -81,9 +82,10 @@ int DBManager::createTables() {
 
     // No Impact Function
     sqlInsertNoFunc = "INSERT INTO Impact_Functions("
-            "probability, weightRspTime, weightResources, minRangeRspTime, maxRangeRspTime, minRangeResources,"
+            "probability, weightRspTime, weightResources, intersection,"
+            "minRangeRspTime, maxRangeRspTime, minRangeResources,"
             "maxRangeResources)"
-            "VALUES (0, 0, 0, 0, 0, 0, 0);";
+            "VALUES (0, 0, 0, 0, 0, 0, 0, 0);";
 
     rCode = sqlite3_exec(_db, sqlInsertNoFunc, NULL, NULL, &errMsg);
 
@@ -133,13 +135,15 @@ int DBManager::addImpactFunction(ImpactFunction impact) {
     int rCode;
     float probability;
     float weightRspTime, weightResources;
+    float intersection;
     float minRangeRspTime, maxRangeRspTime;
     float minRangeResources, maxRangeResources;
 
     sqlInsert = "INSERT INTO Impact_Functions"
-            "(probability, weightRspTime, weightResources, minRangeRspTime, maxRangeRspTime, minRangeResources,"
+            "(probability, weightRspTime, weightResources, intersection,"
+            "minRangeRspTime, maxRangeRspTime, minRangeResources,"
             "maxRangeResources)"
-            "VALUES (?, ?, ?, ?, ?, ?, ?);";
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
 
     rCode = sqlite3_prepare(_db, sqlInsert.c_str(), -1, &stmt, 0);
 
@@ -152,6 +156,7 @@ int DBManager::addImpactFunction(ImpactFunction impact) {
     probability = impact.getProbability();
     weightRspTime = impact.getWeight(0);
     weightResources = impact.getWeight(1);
+    intersection = impact.getIntersection();
     minRangeRspTime = impact.getMinRange(0);
     maxRangeRspTime = impact.getMaxRange(0);
     minRangeResources = impact.getMinRange(1);
@@ -160,10 +165,11 @@ int DBManager::addImpactFunction(ImpactFunction impact) {
     sqlite3_bind_double(stmt, 1, probability);
     sqlite3_bind_double(stmt, 2, weightRspTime);
     sqlite3_bind_double(stmt, 3, weightResources);
-    sqlite3_bind_double(stmt, 4, minRangeRspTime);
-    sqlite3_bind_double(stmt, 5, maxRangeRspTime);
-    sqlite3_bind_double(stmt, 6, minRangeResources);
-    sqlite3_bind_double(stmt, 7, maxRangeResources);
+    sqlite3_bind_double(stmt, 4, intersection);
+    sqlite3_bind_double(stmt, 5, minRangeRspTime);
+    sqlite3_bind_double(stmt, 6, maxRangeRspTime);
+    sqlite3_bind_double(stmt, 7, minRangeResources);
+    sqlite3_bind_double(stmt, 8, maxRangeResources);
 
     rCode = sqlite3_step(stmt);
 
@@ -235,6 +241,7 @@ std::vector<ImpactFunction> DBManager::getImpactFunctions() {
     // impact variables
     int impactId;
     float probability;
+    float intersection;
     std::vector<float> *weights;
     std::vector<float> *minRange;
     std::vector<float> *maxRange;
@@ -252,15 +259,18 @@ std::vector<ImpactFunction> DBManager::getImpactFunctions() {
         rCode = sqlite3_step(stmt);
         if (rCode == SQLITE_ROW) {
             impactId = sqlite3_column_int(stmt, 0);
-            probability = (float) sqlite3_column_double(stmt, 0);
-            weights->at(0) = (float) sqlite3_column_double(stmt, 1);
-            weights->at(1) = (float) sqlite3_column_double(stmt, 2);
-            minRange->at(0) = (float) sqlite3_column_double(stmt, 3);
-            maxRange->at(0) = (float) sqlite3_column_double(stmt, 4);
-            minRange->at(1) = (float) sqlite3_column_double(stmt, 5);
-            maxRange->at(1) = (float) sqlite3_column_double(stmt, 6);
+            probability = (float) sqlite3_column_double(stmt, 1);
+            weights->at(0) = (float) sqlite3_column_double(stmt, 2);
+            weights->at(1) = (float) sqlite3_column_double(stmt, 3);
+            intersection = (float) sqlite3_column_double(stmt, 4);
+            minRange->at(0) = (float) sqlite3_column_double(stmt, 5);
+            maxRange->at(0) = (float) sqlite3_column_double(stmt, 6);
+            minRange->at(1) = (float) sqlite3_column_double(stmt, 7);
+            maxRange->at(1) = (float) sqlite3_column_double(stmt, 8);
 
-            result.insert(result.end(), ImpactFunction(impactId, probability, 3, *weights, *minRange, *maxRange));
+            // 3 is the number of dimensions
+            result.insert(result.end(), ImpactFunction(impactId, probability, 3,
+                                                       intersection, *weights, *minRange, *maxRange));
         }
         else if (rCode == SQLITE_DONE) {
             break;

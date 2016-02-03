@@ -18,31 +18,29 @@ private:
     int _impactId;
     float _probability;
     int _nDimensions;
+    float _intersection;
     std::vector<float> _weights;
     std::vector<float> _minRange;
     std::vector<float> _maxRange;
 
 public:
 
-    ImpactFunction(float _probability, int _nDimensions, const std::vector<float> _weights,
+    ImpactFunction(float _probability, int _nDimensions, float _intersection, const std::vector<float> _weights,
                    const std::vector<float> _minRange, const std::vector<float> _maxRange) : _probability(
-                                                                                                        _probability),
-                                                                                               _nDimensions(
-                                                                                                       _nDimensions),
-                                                                                               _weights(_weights),
+            _probability), _nDimensions(_nDimensions), _intersection(_intersection), _weights(_weights),
                                                                                                _minRange(_minRange),
                                                                                                _maxRange(_maxRange) { }
 
 
-    ImpactFunction(int _impactId, float _probability, int _nDimensions, const std::vector<float> _weights,
-                   const std::vector<float> _minRange, const std::vector<float> _maxRange) : _impactId(_impactId),
-                                                                                               _probability(
-                                                                                                       _probability),
-                                                                                               _nDimensions(
-                                                                                                       _nDimensions),
-                                                                                               _weights(_weights),
-                                                                                               _minRange(_minRange),
-                                                                                               _maxRange(_maxRange) { }
+    ImpactFunction(int _impactId, float _probability, int _nDimensions, float _intersection,
+                   const std::vector<float> _weights, const std::vector<float> _minRange,
+                   const std::vector<float> _maxRange) : _impactId(_impactId), _probability(_probability),
+                                                          _nDimensions(_nDimensions), _intersection(_intersection),
+                                                          _weights(_weights), _minRange(_minRange),
+                                                          _maxRange(_maxRange) { }
+    
+
+
 
     int getImpactId() const {
         return _impactId;
@@ -54,6 +52,10 @@ public:
 
     int getNDimensions() const {
         return _nDimensions;
+    }
+
+    float getIntersection() const {
+        return _intersection;
     }
 
     float getWeight(int dimension) {

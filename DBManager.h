@@ -28,6 +28,7 @@ public:
     DBManager(std::string fileName);
     ~DBManager();
 
+
     /*
      * If tables exist they are dropped
      * and new tables are created.
@@ -38,10 +39,10 @@ public:
 
     /*
      * Adds impact function details to table Impact_Functions.
-     *  ____________________________________________________________________________________________________________
-     *  |ImpactId|weightRspTime|weightResources|minRangeRspTime|maxRangeRspTime|minRangeResources|maxRangeResources|
-     *  \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-     *  | INT    | REAL        | REAL          | REAL          | REAL          | REAL            | REAL            |
+     *  _____________________________________________________________________________________________________________________________________
+     *  |ImpactId|probability|weightRspTime|weightResources|intersection|minRangeRspTime|maxRangeRspTime|minRangeResources|maxRangeResources|
+     *  \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+     *  | INT    | REAL      | REAL        | REAL          | REAL       | REAL          | REAL          | REAL            | REAL            |
      *
      * Receives impact which should have the details of an impact function
      * Returns DBMANAGER_ERR if unsuccessful and ImpactId otherwise

@@ -12,6 +12,10 @@
 
 int assingFunctionToSample(Sample sample, DBManager *dbManager);
 
+// uses gsl lib
 void updateFunctions(DBManager *dbManager);
+
+// uses R script
+void updateFunctions();
 
 #endif //MODELUPDATE_UPDATE_H

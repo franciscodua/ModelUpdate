@@ -99,3 +99,9 @@ void updateFunctions(DBManager *dbManager) {
         updateFunction(ids.at(i), dbManager);
     }
 }
+
+void updateFunctions() {
+    std::string cmd = "Rscript /Users/francisco/Documents/Working-dir/ModelUpdate/Plotting/UpdateModel.R";
+
+    system(cmd.c_str());
+}

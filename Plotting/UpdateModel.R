@@ -1,27 +1,47 @@
+library(methods)
+library(DBI)
 library("RSQLite")
+#args <- commandArgs(trailingOnly = TRUE)
+#impactId <- args[1]
 
-args <- commandArgs(trailingOnly = TRUE)
+updateFunction <- function(impactId, con){
+	#con = dbConnect(drv=RSQLite::SQLite(), dbname=dbname)
+	samples <- dbGetQuery(conn=con,
+		statement=paste("SELECT RspTime, Resources, NewRspTime
+			FROM Samples WHERE Impact=", impactId, ";"))
 
-impactId <- args[1]
+	#print(samples$NewRspTime)
 
-con = dbConnect(drv=RSQLite::SQLite(), dbname="../db.sqlite")
+	fit <- lm(samples$NewRspTime ~ samples$RspTime + samples$Resources)
 
-samples <- dbGetQuery(conn=con,
-	statement=paste("SELECT RspTime, Resources, NewRspTime
-		FROM Samples WHERE Impact=", impactId, ";"))
+	wRspTime <- summary(fit)$coefficients[2, 1]
+	wResources <- summary(fit)$coefficients[3, 1]
+	intersection <- summary(fit)$coefficients[1, 1]
 
-fit <- lm(samples$NewRspTime ~ samples$RspTime + samples$Resources)
+	updateQuery <- paste("UPDATE Impact_Functions SET weightRspTime =",
+		wRspTime, ", weightResources=", wResources,
+		", intersection=", intersection,
+		"WHERE ImpactId=", impactId, ";")
 
-wRspTime <- summary(fit)$coefficients[2, 1]
-wResources <- summary(fit)$coefficients[3, 1]
-intersect <- summary(fit)$coefficients[1, 1]
+	print(updateQuery)
+	dbGetQuery(con, updateQuery)
+}
 
-updateQuery <- paste("UPDATE Impact_Functions SET weightRspTime =",
-	wRspTime, ", weightResources=", wResources,
-	"WHERE ImpactId=", impactId, ";")
+updateFunctions <- function(dbname = "../db.sqlite") {
+	con = dbConnect(drv=RSQLite::SQLite(), dbname=dbname)
+	# > 1 because first function is NO_FUNC
+	idsTable <- dbGetQuery(conn=con, statement="SELECT ImpactId
+		FROM Impact_Functions
+		WHERE ImpactId > 1;")
+	ids <- idsTable$ImpactId
+	dim <- length(ids)
 
-dbGetQuery(con, updateQuery)
+	#print(ids)
 
-print(updateQuery)
+	for (i in 1:dim) {
+		updateFunction(ids[i], con)
+	}
+	dbDisconnect(con)
+}
 
-dbDisconnect(con)
+updateFunctions("/Users/francisco/Documents/Working-dir/ModelUpdate/db.sqlite")
