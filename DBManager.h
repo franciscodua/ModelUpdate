@@ -62,6 +62,10 @@ public:
     int addSample(Sample sample);
 
     std::vector<ImpactFunction> getImpactFunctions();
+
+    std::vector<int> getImpactIds();
+
+    std::vector<Sample> getSamples(int impactId);
 };
 
 

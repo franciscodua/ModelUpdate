@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "bootstrap.h"
+#include "update.h"
 
 int main() {
     std::vector<float> weights, minRange, maxRange;
@@ -18,8 +19,9 @@ int main() {
 
     generateSynthetic(*impact, dbManager);
 
-    std::vector<ImpactFunction> impacts = dbManager->getImpactFunctions();
+    //std::vector<ImpactFunction> impacts = dbManager->getImpactFunctions();
 
+    updateFunctions(dbManager);
 
     delete(dbManager);
     delete(impact);

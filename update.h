@@ -12,4 +12,6 @@
 
 int assingFunctionToSample(Sample sample, DBManager *dbManager);
 
+void updateFunctions(DBManager *dbManager);
+
 #endif //MODELUPDATE_UPDATE_H

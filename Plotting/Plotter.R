@@ -32,3 +32,5 @@ legend("right",
 	col=c("blue", "red"),
 	pch=c(19, 19),
 	inset = -0.11, bty="n", xpd = TRUE)
+
+dbDisconnect(con)
