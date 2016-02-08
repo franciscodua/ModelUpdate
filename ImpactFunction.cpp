@@ -14,6 +14,8 @@ float ImpactFunction::computeOutput(std::vector<float> variables) {
         result += variables[i] * getWeight(i);
     }
 
+    result += getIntersection();
+
     return result;
 }
 

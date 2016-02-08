@@ -83,13 +83,6 @@ void updateFunction(int id, DBManager *dbManager) {
     gsl_multifit_linear_free(workspace);
 }
 
-/*void updateFunction(int id, DBManager *dbManager) {
-    std::string cmd = "Rscript /Users/francisco/Documents/Working-dir/ModelUpdate/Plotting/UpdateModel.R " +
-            std::to_string(id);
-
-    system(cmd.c_str());
-}*/
-
 void updateFunctions(DBManager *dbManager) {
     std::vector<int> ids;
 
