@@ -3,6 +3,8 @@
 //
 
 #include "update.h"
+#include "stdafx.h"
+#include "interpolation.h"
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_multifit.h>
@@ -37,6 +39,47 @@ int assingFunctionToSample(Sample sample, DBManager *dbManager) {
     return impactId;
 }
 
+void updateFunction(int id, DBManager *dbManager) {
+    std::vector<Sample> samples;
+    int size;
+
+    std::string yStr;
+    std::string matrixStr;
+
+    samples = dbManager->getSamples(id);
+
+    size = (int) samples.size();
+
+    yStr = "[";
+    matrixStr = "[";
+
+    for (int i = 0; i < size; i++) {
+        yStr += std::to_string(samples.at(i).getNewRspTime()) + ", ";
+
+        matrixStr += "[" + std::to_string(samples.at(i).getRspTime()) +
+                ", " + std::to_string(samples.at(i).getResources()) + "], ";
+    }
+
+    yStr.resize(yStr.size() - 1);
+    matrixStr.resize(matrixStr.size() - 1);
+
+    yStr += "]";
+    matrixStr += "]";
+
+    alglib::real_2d_array fmatrix = matrixStr.c_str();
+    alglib::real_1d_array y = yStr.c_str();
+    alglib::ae_int_t info;
+    alglib::real_1d_array c;
+
+    alglib::lsfitreport rep;
+
+
+    alglib::lsfitlinear(y, fmatrix, info, c, rep);
+
+    printf("c: %f", c.getcontent()[0]);
+}
+
+/*
 void updateFunction(int id, DBManager *dbManager) {
     std::vector<Sample> samples;
     gsl_matrix *X;
@@ -82,7 +125,7 @@ void updateFunction(int id, DBManager *dbManager) {
     gsl_vector_free(beta);
     gsl_multifit_linear_free(workspace);
 }
-
+*/
 void updateFunctions(DBManager *dbManager) {
     std::vector<int> ids;
 

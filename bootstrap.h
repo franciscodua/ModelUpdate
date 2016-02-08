@@ -8,7 +8,6 @@
 #include <string>
 #include "ImpactFunction.h"
 #include "DBManager.h"
-
 /*
  * Receives impact function inserts it in Impact_Functions, generates samples from it and adds them to database
  */
