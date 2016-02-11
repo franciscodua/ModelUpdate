@@ -333,7 +333,6 @@ std::vector<Sample> DBManager::getSamples(int impactId) {
     sqlite3_stmt *stmt;
     int rCode;
     Sample *sample;
-    float rspTime, resources, newRspTime;
 
     sqlSelect = "SELECT RspTime, Resources, NewRspTime FROM Samples WHERE Impact =" +
             std::to_string(impactId) + " ;";

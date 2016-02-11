@@ -2,15 +2,12 @@
 
 #include "bootstrap.h"
 #include "update.h"
-#include <memory>
 
 int main() {
     std::vector<float> weights, minRange, maxRange;
     float intersection;
     DBManager *dbManager;
-    //DBManager *dbManager;
-    /*dbManager = std::make_shared<DBManager>(new DBManager(
-            "/Users/francisco/Documents/IST/Working-dir/ModelUpdate/db.sqlite"));*/
+
     dbManager = new DBManager("/Users/francisco/Documents/IST/Working-dir/ModelUpdate/db.sqlite");
 
     std::cout << "Init DB:" << std::endl;
