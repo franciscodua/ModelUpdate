@@ -80,4 +80,4 @@ updateFunctions <- function(dbname = "../db.sqlite") {
 }
 
 # call to be used when Rscript is used
-updateFunctions("/Users/francisco/Documents/Working-dir/ModelUpdate/db.sqlite")
+updateFunctions("/Users/francisco/Documents/IST/Working-dir/ModelUpdate/db.sqlite")

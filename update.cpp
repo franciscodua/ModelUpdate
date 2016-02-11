@@ -38,7 +38,7 @@ int assingFunctionToSample(Sample sample, DBManager *dbManager) {
 
     return impactId;
 }
-
+/*
 void updateFunction(int id, DBManager *dbManager) {
     std::vector<Sample> samples;
     int size;
@@ -77,7 +77,7 @@ void updateFunction(int id, DBManager *dbManager) {
     alglib::lsfitlinear(y, fmatrix, info, c, rep);
 
     printf("c: %f", c.getcontent()[0]);
-}
+}*/
 
 /*
 void updateFunction(int id, DBManager *dbManager) {
@@ -132,12 +132,12 @@ void updateFunctions(DBManager *dbManager) {
     ids = dbManager->getImpactIds();
 
     for (int i = 0; i < ids.size(); i++) {
-        updateFunction(ids.at(i), dbManager);
+        //updateFunction(ids.at(i), dbManager);
     }
 }
 
 void updateFunctions() {
-    std::string cmd = "Rscript /Users/francisco/Documents/Working-dir/ModelUpdate/Plotting/UpdateModel.R";
+    std::string cmd = "Rscript /Users/francisco/Documents/IST/Working-dir/ModelUpdate/Plotting/UpdateModel.R";
 
     system(cmd.c_str());
 }
