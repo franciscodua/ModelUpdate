@@ -2,6 +2,35 @@ library(methods)
 library(DBI)
 library("RSQLite")
 
+library(frbs)
+
+getSamples <- function(con, impactId) {
+	samples <- dbGetQuery(conn=con,
+		statement=paste("SELECT RspTime, Resources, NewRspTime
+			FROM Samples WHERE Impact=", impactId, ";"))
+	samples
+}
+
+normalize <- function(x) {
+	(x - min(x)) / (max(x) - min(x))
+}
+
+newRules <- function(con) {
+	# retrieves samples with no function associated (impactId = 1)
+	samples <- getSamples(con, 2)
+	# normalized data
+	samples.norm <- data.frame (lapply(samples, normalize))
+	# data should be normalized before
+	range.data <- matrix(c(0, 1, 0, 1, 0, 1), ncol = 3)
+	# subtractive clustering
+	method.type <- "SBC"
+	# standard values
+	control.SBC <- list(r.a = 1, eps.high = 0.5, eps.low = 0.15, name = "Sim-0")
+
+	object.SBC <- frbs.learn(samples.norm, range.data, method.type, control.SBC)
+	object.SBC
+}
+
 updateFunction <- function(impactId, minRanges, maxRanges, con){
 # Updates the Impact_Functions tables with the new values for the
 # impact Function with impactId
@@ -36,6 +65,9 @@ updateFunction <- function(impactId, minRanges, maxRanges, con){
 	wRspTime <- summary(fit)$coefficients[2, 1]
 	wResources <- summary(fit)$coefficients[3, 1]
 	intersection <- summary(fit)$coefficients[1, 1]
+
+	print (paste("Function" , impactId,":", wRspTime, "RspTime +", wResources,
+		"Resources +", intersection))
 
 	# updates Impact Function details in DB with new values
 	updateQuery <- paste("UPDATE Impact_Functions SET weightRspTime =",

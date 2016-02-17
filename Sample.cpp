@@ -5,5 +5,8 @@
 #include "Sample.h"
 
 std::vector<float> Sample::getVariables() {
-    return std::vector<float>(getRspTime(), getResources());
+    std::vector<float> variables(2);
+    variables[0] = getRspTime();
+    variables[1] = getResources();
+    return variables;
 }

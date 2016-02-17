@@ -3,12 +3,10 @@
 //
 
 #include "update.h"
-#include "stdafx.h"
-#include "interpolation.h"
+#include <random>
 #include <gsl/gsl_matrix.h>
-#include <gsl/gsl_math.h>
-#include <gsl/gsl_multifit.h>
-#include <string>
+
+#define N_REAL_SAMPLES 500
 
 int assingFunctionToSample(Sample sample, DBManager *dbManager) {
     int impactId;
@@ -140,4 +138,47 @@ void updateFunctions() {
     std::string cmd = "Rscript /Users/francisco/Documents/IST/Working-dir/ModelUpdate/Plotting/UpdateModel.R";
 
     system(cmd.c_str());
+}
+
+void generateRealSamples(ImpactFunction impact, DBManager *dbManager) {
+    int nDimensions;
+    std::vector<float> vars(2);
+    std::vector<int> minRanges(2);
+    std::vector<int> maxRanges(2);
+    Sample *sample;
+    int samples;
+    std::default_random_engine generator;
+    std::uniform_real_distribution<float> distribution(0.0,1.0);
+    float randomNumber;
+    float rspTime, resources;
+
+    nDimensions = impact.getNDimensions();
+    // number of samples to be generated. Probability times constant
+    samples = N_REAL_SAMPLES;
+
+    for (int i = 0; i < nDimensions - 1; i++) {
+        minRanges[i] = (int) impact.getMinRange(i);
+        maxRanges[i] = (int) impact.getMaxRange(i);
+    }
+
+    sample = new Sample(0, 0, 0, false);
+
+    // generates samples.
+    for (int i = 0; i < samples; i++) {
+        randomNumber = distribution(generator);
+        rspTime = (randomNumber * (maxRanges[0] - minRanges[0])) + minRanges[0];
+        vars[0] = rspTime;
+
+        randomNumber = distribution(generator);
+        resources = (randomNumber * (maxRanges[1] - minRanges[1])) + minRanges[1];
+        vars[1] = resources;
+
+        sample->setRspTime(rspTime);
+        sample->setResources(resources);
+        sample->setNewRspTime(impact.computeOutput(vars));
+
+        assingFunctionToSample(*sample, dbManager);
+    }
+
+    delete(sample);
 }

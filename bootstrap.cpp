@@ -40,7 +40,7 @@ void generate_samples(ImpactFunction impact, int impactId, DBManager *dbManager)
     samplesPerRow = (int) floor(sqrt(samples));
     rest = samples - (samplesPerRow*samplesPerRow);
 
-    sample = new Sample(0, 0, 0, impactId, false);
+    sample = new Sample(0, 0, 0, impactId, true);
 
     // generates samples. floor * floor <= samples
     for (int x = 0; x < samplesPerRow; x++) {

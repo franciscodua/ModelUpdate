@@ -223,8 +223,8 @@ int DBManager::addSample(Sample sample) {
         return DBMANAGER_ERR;
     }
 
-    std::cout << "Sample generated: (" << rspTime << ", " << resources << ", " << newRspTime
-    << ", " << impactId << ")" << std::endl;
+    //std::cout << "Sample generated: (" << rspTime << ", " << resources << ", " << newRspTime
+    //<< ", " << impactId << ")" << std::endl;
 
     sqlite3_finalize(stmt);
 

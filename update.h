@@ -18,4 +18,6 @@ void updateFunctions(DBManager *dbManager);
 // uses R script
 void updateFunctions();
 
+void generateRealSamples(ImpactFunction impact, DBManager *dbManager);
+
 #endif //MODELUPDATE_UPDATE_H
