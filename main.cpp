@@ -104,9 +104,9 @@ int main() {
 
     dbManager = new DBManager("/Users/francisco/Documents/IST/Working-dir/ModelUpdate/db.sqlite");
 
-    //init(dbManager);
+    init(dbManager);
     //test1(dbManager);
-    test2(dbManager);
+    //test2(dbManager);
     //test3(dbManager);
 
     delete(dbManager);
