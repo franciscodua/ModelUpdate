@@ -62,9 +62,15 @@ updateFunction <- function(impactId, minRanges, maxRanges, con){
 	# linear regression
 	fit <- lm(samples$NewRspTime ~ samples$RspTime + samples$Resources)
 
-	wRspTime <- summary(fit)$coefficients[2, 1]
-	wResources <- summary(fit)$coefficients[3, 1]
-	intersection <- summary(fit)$coefficients[1, 1]
+	coefficients <- coef(fit)
+
+	wRspTime <- coefficients[[2]]
+	wResources <- coefficients[[3]]
+	intersection <- coefficients[[1]]
+
+	#wRspTime <- summary(fit)$coefficients[2, 1]
+	#wResources <- summary(fit)$coefficients[3, 1]
+	#intersection <- summary(fit)$coefficients[1, 1]
 
 	print (paste("Function" , impactId,":", wRspTime, "RspTime +", wResources,
 		"Resources +", intersection))
