@@ -4,6 +4,7 @@ import warnings
 
 from objects import Point
 import kmeans
+import graph
 
 
 def read_points_csv(input_file):
@@ -37,6 +38,8 @@ def main():
 
     for c in clusters:
         print "Cluster: " + str(c.centroid) + ". Accuracy: " + str(c.accuracy)
+
+    graph.graph(input_file, clusters)
 
 
 if __name__ == "__main__":
