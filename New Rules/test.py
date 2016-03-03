@@ -1,5 +1,6 @@
 import sys
 import csv
+import warnings
 
 from objects import Point
 import kmeans
@@ -23,6 +24,7 @@ def read_points_csv(input_file):
 
 
 def main():
+    warnings.filterwarnings("ignore")
     # Generate some points
     if len(sys.argv) > 1:
         input_file = sys.argv[1]
