@@ -33,10 +33,7 @@ def main():
 
     points = read_points_csv(input_file)
 
-    # When do we say the optimization has 'converged' and stop updating clusters
-    opt_cutoff = 0.5
-
-    clusters = kmeans.fit_functions(points, opt_cutoff)
+    clusters = kmeans.fit_functions(points)
 
     for c in clusters:
         print "Cluster: " + str(c.centroid) + ". Accuracy: " + str(c.accuracy)

@@ -86,13 +86,12 @@ def kmeans(points, k, cutoff):
 
 def fit_functions(points, cutoff=0.1, threshold=0.1):
     N_TIMES = 100
-    error = 1
 
     # k = 1 has the same result every time
     clusters = kmeans(points, 1, cutoff)
     error = compute_mean_error(clusters)
     # A max k must be defined (10 for the moment)
-    for k in range(2, 10):
+    for k in range(2, 11):
         for i in range(N_TIMES):
             new_clusters = kmeans(points, k, cutoff)
             new_error = compute_mean_error(new_clusters)
