@@ -13,7 +13,7 @@ def compute_mean_error(clusters):
     """
     accuracy = 0
     for c in clusters:
-        accuracy += c.error
+        accuracy += c.accuracy
     return 1 - (accuracy / len(clusters))
 
 

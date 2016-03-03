@@ -39,7 +39,7 @@ def main():
     clusters = kmeans.fit_functions(points, opt_cutoff)
 
     for c in clusters:
-        print "Cluster: " + str(c.centroid) + ". Accuracy: " + str(c.error)
+        print "Cluster: " + str(c.centroid) + ". Accuracy: " + str(c.accuracy)
 
 
 if __name__ == "__main__":

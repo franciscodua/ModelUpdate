@@ -78,7 +78,7 @@ class Function(Point):
         # error
         return abs(prediction - point.coords[input_size])
 
-    def compute_fit_error(self, points):
+    def compute_fit_accuracy(self, points):
         # total sum of squares
         ss_tot = self.__total_sum_squares(points)
         # residual sum of squares
