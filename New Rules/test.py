@@ -39,7 +39,7 @@ def main():
     for c in clusters:
         print "Cluster: " + str(c.centroid) + ". Accuracy: " + str(c.accuracy)
 
-    graph.graph(input_file, clusters)
+    graph.new_graph(clusters)
 
 
 if __name__ == "__main__":
