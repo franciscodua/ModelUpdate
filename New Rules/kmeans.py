@@ -5,16 +5,22 @@ from cluster import Cluster
 DEBUG = False
 
 
+#def compute_mean_error(clusters):
+ #   """
+  #  compute the mean error of the clusters found based on their accuracy
+   # :param clusters: list of cluster objects
+    #:return: mean error
+    #"""
+    #accuracy = 0
+    #for c in clusters:
+     #   accuracy += c.accuracy
+    #return 1 - (accuracy / len(clusters))
+
 def compute_mean_error(clusters):
-    """
-    compute the mean error of the clusters found based on their accuracy
-    :param clusters: list of cluster objects
-    :return: mean error
-    """
-    accuracy = 0
+    error = 0
     for c in clusters:
-        accuracy += c.accuracy
-    return 1 - (accuracy / len(clusters))
+        error += c.error
+    return error / len(clusters)
 
 
 def kmeans(points, k, cutoff):
@@ -89,11 +95,13 @@ def fit_functions(points, cutoff=0.1, threshold=0.1):
 
     # k = 1 has the same result every time
     clusters = kmeans(points, 1, cutoff)
+    #error = compute_mean_error(clusters)
     error = compute_mean_error(clusters)
     # A max k must be defined (10 for the moment)
     for k in range(2, 11):
         for i in range(N_TIMES):
             new_clusters = kmeans(points, k, cutoff)
+            #new_error = compute_mean_error(new_clusters)
             new_error = compute_mean_error(new_clusters)
             if new_error < error:
                 error = new_error

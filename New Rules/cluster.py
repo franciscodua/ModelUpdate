@@ -32,7 +32,8 @@ class Cluster:
         # Set up the initial centroid (this is usually based off one point)
         self.centroid = self.calculate_centroid_function()
 
-        self.accuracy = 0
+        #self.accuracy = 0
+        self.error = 1
 
     def __repr__(self):
         return str(self.points)
@@ -47,7 +48,8 @@ class Cluster:
         old_centroid = self.centroid
         self.points = points
         self.centroid = self.calculate_centroid_function()
-        self.accuracy = self.centroid.compute_fit_accuracy(self.points)
+        #self.accuracy = self.centroid.compute_fit_accuracy(self.points)
+        self.error = self.centroid.compute_fit_error(self.points)
         shift = self.centroid.get_distance(old_centroid)
         return shift
 

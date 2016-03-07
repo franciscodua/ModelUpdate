@@ -16,7 +16,7 @@ from cluster import Cluster
 	#ro.r('dev.off()')
 
 
-def new_graph(clusters):
+def new_graph(clusters, output_graph):
 	colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k']
 	colors_len = len(colors)
 	color_index = 0
@@ -37,5 +37,5 @@ def new_graph(clusters):
 		plt.plot(points_x, m * np.asarray(points_x) + b, color + '-')
 
 		color_index = (color_index + 1) % colors_len
-	plt.savefig('test.png')
+	plt.savefig(output_graph)
 	plt.show()

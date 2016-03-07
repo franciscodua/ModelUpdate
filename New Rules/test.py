@@ -32,14 +32,19 @@ def main():
     else:
         input_file = raw_input("File containing Samples:")
 
+    if len(sys.argv) > 2:
+        output_graph = sys.argv[2]
+    else:
+        output_graph = "test.png"
+
     points = read_points_csv(input_file)
 
     clusters = kmeans.fit_functions(points)
 
     for c in clusters:
-        print "Cluster: " + str(c.centroid) + ". Accuracy: " + str(c.accuracy)
+        print "Cluster: " + str(c.centroid) + ". Error: " + str(c.error)
 
-    graph.new_graph(clusters)
+    graph.new_graph(clusters, output_graph)
 
 
 if __name__ == "__main__":
