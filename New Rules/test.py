@@ -35,7 +35,7 @@ def main():
     if len(sys.argv) > 2:
         output_graph = sys.argv[2]
     else:
-        output_graph = "test.png"
+        output_graph = "test"
 
     points = read_points_csv(input_file)
 
@@ -44,7 +44,7 @@ def main():
     for c in clusters:
         print "Cluster: " + str(c.centroid) + ". Error: " + str(c.error)
 
-    #graph.new_graph(clusters, output_graph)
+    graph.new_graph(clusters, output_graph)
     graph.graph_cost(error_values, output_graph)
 
 

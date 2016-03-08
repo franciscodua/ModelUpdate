@@ -96,13 +96,17 @@ def fit_functions(points, cutoff=0.1, threshold=0.1):
     error_values = []
     # k = 1 has the same result every time
     clusters = kmeans(points, 1, cutoff)
-    print "Now Clustering for K = 1"
+    #print "Now Clustering for K = 1"
     #error = compute_mean_error(clusters)
     error = compute_mean_error(clusters)
+    # save previous state
+    previous_error = error
+    previous_clusters = clusters
+
     error_values.append(error)
     # A max k must be defined (10 for the moment)
-    for k in range(2, 11):
-        print "Now Clustering for K = %s" % k
+    for k in range(2, 31):
+        #print "Now Clustering for K = %s" % k
         for i in range(N_TIMES):
             new_clusters = kmeans(points, k, cutoff)
             #new_error = compute_mean_error(new_clusters)
@@ -110,7 +114,13 @@ def fit_functions(points, cutoff=0.1, threshold=0.1):
             if new_error < error:
                 error = new_error
                 clusters = new_clusters
-        #if error < threshold:
-            #break
+
         error_values.append(error)
+        # if error begins to stagnate stop
+        if previous_error - error < 0.04:
+            clusters = previous_clusters
+            print "Stopped at K = %s" % k
+            break
+        previous_clusters = clusters
+        previous_error = error
     return error_values, clusters
