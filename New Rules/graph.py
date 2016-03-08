@@ -4,18 +4,6 @@ import numpy as np
 
 from cluster import Cluster
 
-
-#def graph(input_file, clusters):
-	#ro.r('data <- read.csv("' + input_file + '", header=FALSE)')
-	#ro.r('jpeg("' + input_file.split('/')[-1].split('.')[0] + '.jpg")')
-	#ro.r('plot(x=data$V1, y=data$V2)')
-	#for c in clusters:
-	#	function = c.centroid.coords
-	#	ro.r('abline(a=' + str(function[1]) +
-	#		', b=' + str(function[0]) + ', col="red")')
-	#ro.r('dev.off()')
-
-
 def new_graph(clusters, output_graph):
 	colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k']
 	colors_len = len(colors)
@@ -39,3 +27,11 @@ def new_graph(clusters, output_graph):
 		color_index = (color_index + 1) % colors_len
 	plt.savefig(output_graph)
 	plt.show()
+
+def graph_cost(error_values, output_graph):
+	plt.plot(range(1, len(error_values) + 1), error_values, 'bo')
+	for i in range(len(error_values)):
+		plt.text(i + 1, error_values[i], '(' + str(i + 1) +', ' +
+			str(error_values[i]) + ')')
+	plt.savefig(output_graph)
+

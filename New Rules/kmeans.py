@@ -39,7 +39,7 @@ def kmeans(points, k, cutoff):
 
     # Loop through the dataset until the clusters stabilize
     loop_counter = 0
-    while True:
+    while loop_counter < 1000:
         # Create a list of lists to hold the points in each cluster
         lists = [[] for c in clusters]
         cluster_count = len(clusters)
@@ -87,18 +87,22 @@ def kmeans(points, k, cutoff):
             if DEBUG:
                 print "Converged after %s iterations" % loop_counter
             break
+    if loop_counter >= 1000:
+        print "loop_counter broke off loop"
     return clusters
-
 
 def fit_functions(points, cutoff=0.1, threshold=0.1):
     N_TIMES = 100
-
+    error_values = []
     # k = 1 has the same result every time
     clusters = kmeans(points, 1, cutoff)
+    print "Now Clustering for K = 1"
     #error = compute_mean_error(clusters)
     error = compute_mean_error(clusters)
+    error_values.append(error)
     # A max k must be defined (10 for the moment)
     for k in range(2, 11):
+        print "Now Clustering for K = %s" % k
         for i in range(N_TIMES):
             new_clusters = kmeans(points, k, cutoff)
             #new_error = compute_mean_error(new_clusters)
@@ -106,6 +110,7 @@ def fit_functions(points, cutoff=0.1, threshold=0.1):
             if new_error < error:
                 error = new_error
                 clusters = new_clusters
-        if error < threshold:
-            break
-    return clusters
+        #if error < threshold:
+            #break
+        error_values.append(error)
+    return error_values, clusters

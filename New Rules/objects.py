@@ -89,8 +89,8 @@ class Function(Point):
         error = 0
         prediction = 0
         for p in points:
-            prediction = self.__predict(p)
-            error += abs(prediction - p.coords[output_index]) / prediction
+            prediction = self.__predict(p) 
+            error += abs(prediction - p.coords[output_index]) / (abs(prediction) + 0.0000001)
         return error / len(points)
 
     def compute_fit_accuracy(self, points):
