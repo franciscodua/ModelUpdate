@@ -87,8 +87,6 @@ def kmeans(points, k, cutoff):
             if DEBUG:
                 print "Converged after %s iterations" % loop_counter
             break
-    if loop_counter >= 1000:
-        print "loop_counter broke off loop"
     return clusters
 
 def fit_functions(points, cutoff=0.1, threshold=0.1):
@@ -119,8 +117,9 @@ def fit_functions(points, cutoff=0.1, threshold=0.1):
         # if error begins to stagnate stop
         if previous_error - error < 0.04:
             clusters = previous_clusters
-            print "Stopped at K = %s" % k
             break
+
         previous_clusters = clusters
         previous_error = error
+        
     return error_values, clusters
