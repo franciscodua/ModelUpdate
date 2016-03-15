@@ -1,7 +1,7 @@
 import socket
 
 
-class HAProxyStats:
+class HAProxyConnector:
     """
     Communicate with HAProxy through its UNIX socket (e.g. show stat)
     """
@@ -39,22 +39,58 @@ class HAProxyStats:
 
         return stats
 
-    def get_stats(self):
+    def send_command(self, command):
         """
-        Communicate with socket "show stat". Ask for stats, parse them, return
-        :return: dictionary with stats
+        send commands to HAProxy via UNIX socket
+        :param command: string with command to be sent
+        :return: result of executing command
         """
         sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         sock.connect(self.sock_name)
-        sock.send("show stat\n")
+        sock.send(command + "\n")
 
         received = ""
 
         while received == "":
             received = sock.recv(1024)
 
-        stats = self.__read_csv_to_dict(received)
-
         sock.close()
 
+        return received
+
+    def get_stats(self):
+        """
+        Communicate with socket "show stat". Ask for stats, parse them, return
+        :return: dictionary with stats
+        """
+        received = self.send_command("show stat")
+
+        stats = self.__read_csv_to_dict(received)
+
         return stats
+
+    def disable_server(self, server_name):
+        """
+        Communicate with socket "disable server".
+        Note: This command is restricted and can only be issued on sockets configured for level "admin"
+        :param server_name: string with server name (e.g. lamp1)
+        :return: void
+        """
+        command = "disable server " + server_name
+
+        self.send_command(command)
+
+        return
+
+    def enable_server(self, server_name):
+        """
+        Communicate with socket "enable server".
+        Note: This command is restricted and can only be issued on sockets configured for level "admin"
+        :param server_name: string with server name (e.g. lamp1)
+        :return: void
+        """
+        command = "enable server " + server_name
+
+        self.send_command(command)
+
+        return
