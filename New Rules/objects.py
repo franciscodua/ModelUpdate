@@ -1,5 +1,6 @@
 import math
 
+
 class Point:
     """
     A point in n dimensional space
@@ -87,7 +88,6 @@ class Function(Point):
     def compute_fit_error(self, points):
         output_index = self.n - 1
         error = 0
-        prediction = 0
         for p in points:
             prediction = self.__predict(p) 
             error += abs(prediction - p.coords[output_index]) / (abs(prediction) + 0.0000001)
