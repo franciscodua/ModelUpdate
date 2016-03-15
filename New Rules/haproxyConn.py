@@ -12,7 +12,8 @@ class HAProxyConnector:
         """
         self.sock_name = sock_name
 
-    def __read_csv_to_dict(self, csv_string):
+    @staticmethod
+    def __read_csv_to_dict(csv_string):
         """
         Convert csv in string format into dictionary.
         csv package only reads from files (this reads from string)

@@ -27,7 +27,7 @@ class Point:
         if self.n != point.n:
             raise Exception("ILLEGAL: non comparable points")
 
-        ret = reduce(lambda x,y: x + pow((self.coords[y]-point.coords[y]), 2), range(self.n), 0.0)
+        ret = reduce(lambda x, y: x + pow((self.coords[y]-point.coords[y]), 2), range(self.n), 0.0)
         return math.sqrt(ret)
 
 
@@ -48,7 +48,8 @@ class Function(Point):
             prediction += (self.coords[i] * point.coords[i])
         return prediction
 
-    def __total_sum_squares(self, points):
+    @staticmethod
+    def __total_sum_squares(points):
         """
         :param points: list of points
         :return: total sum squares (sum(y_i - meanY)^2)
@@ -77,6 +78,7 @@ class Function(Point):
         Prediction error of point using function
         Note: Last item in self.coords is intersection point.
         Note: Last item in point is considered output
+        :param point: point object to which error should be computed
         """
         if self.n != point.n:
             raise Exception("ILLEGAL: Function and points should have same dim")
