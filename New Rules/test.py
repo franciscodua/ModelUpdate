@@ -4,7 +4,7 @@ import warnings
 
 from objects import Point
 import kmeans
-import graph
+# import graph
 
 
 def read_points_csv(input_file):
