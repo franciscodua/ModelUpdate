@@ -44,8 +44,8 @@ def main():
     for c in clusters:
         print "Cluster: " + str(c.centroid) + ". Error: " + str(c.error)
 
-    graph.new_graph(clusters, output_graph)
-    graph.graph_cost(error_values, output_graph)
+    # graph.new_graph(clusters, output_graph)
+    # graph.graph_cost(error_values, output_graph)
 
 
 if __name__ == "__main__":
