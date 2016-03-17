@@ -77,7 +77,7 @@ class HAProxyConnector:
         :param server_name: string with server name (e.g. lamp1)
         :return: void
         """
-        command = "disable server " + server_name
+        command = "disable server servers/" + server_name
 
         self.send_command(command)
 
@@ -90,7 +90,7 @@ class HAProxyConnector:
         :param server_name: string with server name (e.g. lamp1)
         :return: void
         """
-        command = "enable server " + server_name
+        command = "enable server servers/" + server_name
 
         self.send_command(command)
 
