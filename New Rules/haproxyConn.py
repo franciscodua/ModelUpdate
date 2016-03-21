@@ -31,6 +31,7 @@ class HAProxyConnector:
             line_split = line.split(',')
             if line_split[1] == "BACKEND":
                 backend_values = line_split
+                break
             if line_split[1] == "FRONTEND":
                 frontend_values = line_split
 

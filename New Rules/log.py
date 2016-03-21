@@ -16,4 +16,4 @@ class Log:
             for record in self.log_list:
                 f.write(record + '\n')
         self.n_items = 0
-        self.n_items = []
+        self.log_list = []
