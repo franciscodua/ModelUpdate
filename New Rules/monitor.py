@@ -1,4 +1,5 @@
 import sys
+import time
 
 from log import Log
 from haproxyConn import HAProxyConnector
@@ -12,6 +13,7 @@ while True:
     try:
         stats = ha_conn.get_stats()
         log.log(stats["act"] + "," + stats["req_rate"] + "," + stats["rtime"])
+        time.sleep(1)
     except KeyboardInterrupt:
         log.write()
         sys.exit(0)
