@@ -20,25 +20,29 @@ class HAProxyConnector:
         :param csv_string: csv file in string format
         :return: dictionary with stats (key is property and value is "value"
         """
-        stats = dict()
+        backend_stats = dict()
+        frontend_stats = dict()
         lines = csv_string.splitlines()
         names = lines[0].split(',')
-        values = []
+        backend_values = []
+        frontend_values = []
 
         for line in lines:
             line_split = line.split(',')
             if line_split[1] == "BACKEND":
-                values = line_split
-                break
+                backend_values = line_split
+            if line_split[1] == "FRONTEND":
+                frontend_values = line_split
 
-        if len(names) != len(values):
+        if len(names) != len(backend_values):
             # TODO: improve message
             raise Exception("Stats parsing resulted in different number of columns")
 
         for i in range(len(names)):
-            stats[names[i]] = values[i]
+            backend_stats[names[i]] = backend_values[i]
+            frontend_stats[names[i]] = frontend_values[i]
 
-        return stats
+        return backend_stats, frontend_stats
 
     def send_command(self, command):
         """
@@ -66,9 +70,9 @@ class HAProxyConnector:
         """
         received = self.send_command("show stat")
 
-        stats = self.__read_csv_to_dict(received)
+        backend_stats, frontend_stats = self.__read_csv_to_dict(received)
 
-        return stats
+        return backend_stats, frontend_stats
 
     def disable_server(self, server_name):
         """

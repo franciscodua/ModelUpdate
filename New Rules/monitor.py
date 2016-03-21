@@ -11,8 +11,8 @@ log.log("Active, Req_rate, Rsp_time")
 
 while True:
     try:
-        stats = ha_conn.get_stats()
-        log.log(stats["act"] + "," + stats["req_rate"] + "," + stats["rtime"])
+        backend_stats, frontend_stats = ha_conn.get_stats()
+        log.log(backend_stats["act"] + "," + frontend_stats["req_rate"] + "," + backend_stats["rtime"])
         time.sleep(1)
     except KeyboardInterrupt:
         log.write()
