@@ -37,7 +37,8 @@ class HAProxyConnector:
 
         if len(names) != len(backend_values):
             # TODO: improve message
-            raise Exception("Stats parsing resulted in different number of columns")
+            raise Exception("Stats parsing resulted in different number of columns (" +
+                            str(len(names)) + ", " + str(len(backend_values)) + ")")
 
         for i in range(len(names)):
             backend_stats[names[i]] = backend_values[i]

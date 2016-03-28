@@ -1,8 +1,8 @@
 import sys
 import time
 
-from log import Log
 from haproxyConn import HAProxyConnector
+from log import Log
 
 ha_conn = HAProxyConnector("/home/ubuntu/haproxy.sock")
 log = Log("/home/ubuntu/log.txt")

@@ -1,9 +1,11 @@
-import sys
 import csv
+import sys
 import warnings
 
-from objects import Point
-import kmeans
+from KPlane import kmeans
+from KPlane.objects import Point
+
+
 # import graph
 
 
