@@ -5,12 +5,11 @@ include config.mk
 ####################
 
 ClientFiles = URLGenerator URLGeneratorEJB URLGeneratorServlets URLGeneratorPHP RUBiSProperties Stats \
-	      TransitionTable ClientEmulator UserSession InitDB
+	      TransitionTable ClientEmulator UserSession
 	    
-BeansFiles = TimeManagement	    
 
-all_client_sources =  $(addprefix edu/rice/rubis/client/, $(addsuffix .java, $(ClientFiles))) $(addprefix edu/rice/rubis/beans/, $(addsuffix .java, $(BeansFiles)))
-all_client_obj = $(addprefix edu/rice/rubis/client/, $(addsuffix .class, $(ClientFiles))) $(addprefix edu/rice/rubis/beans/, $(addsuffix .class, $(BeansFiles)))
+all_client_sources =  $(addprefix edu/rice/rubis/client/, $(addsuffix .java, $(ClientFiles)))
+all_client_obj = $(addprefix edu/rice/rubis/client/, $(addsuffix .class, $(ClientFiles)))
 
 client: $(all_client_obj)
 	${JAR} cvf rubis_client.jar $(all_client_obj)
