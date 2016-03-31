@@ -27,8 +27,7 @@ class Point:
         if self.n != point.n:
             raise Exception("ILLEGAL: non comparable points")
 
-        ret = reduce(lambda x, y: x + pow((self.coords[y]-point.coords[y]), 2), range(self.n), 0.0)
-        return math.sqrt(ret)
+        return math.sqrt(sum([(self.coords[i] - point.coords[i]) ** 2 for i in range(self.n)]))
 
 
 class Function(Point):
