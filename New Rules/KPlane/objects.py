@@ -37,7 +37,7 @@ class Function(Point):
     coords are weights and interception
     """
 
-    def __predict(self, point):
+    def predict(self, point):
         if self.n != point.n:
             raise Exception("ILLEGAL: Function and points should have same dim")
         input_size = self.n - 1
@@ -47,31 +47,6 @@ class Function(Point):
             # weight_i X point_i
             prediction += (self.coords[i] * point.coords[i])
         return prediction
-
-    @staticmethod
-    def __total_sum_squares(points):
-        """
-        :param points: list of points
-        :return: total sum squares (sum(y_i - meanY)^2)
-        """
-        input_size = len(points[0].coords) - 1
-        y = [p.coords[input_size] for p in points]
-        # (1/n)sum(y_i)
-        mean_y = sum(y) / len(y)
-        result = 0
-        for y_i in y:
-            result += (y_i - mean_y) ** 2
-        return result
-
-    def __residual_sum_squares(self, points):
-        """
-        :param points: list of points
-        :return: residual sum squares (sum(y_i - f_i)^2)
-        """
-        result = 0
-        for i in range(len(points)):
-            result += (self.get_error(points[i])) ** 2
-        return result
 
     def get_error(self, point):
         """
@@ -83,7 +58,7 @@ class Function(Point):
         if self.n != point.n:
             raise Exception("ILLEGAL: Function and points should have same dim")
         output_index = self.n - 1
-        prediction = self.__predict(point)
+        prediction = self.predict(point)
         # error
         return abs(prediction - point.coords[output_index])
 
@@ -91,15 +66,7 @@ class Function(Point):
         output_index = self.n - 1
         error = 0
         for p in points:
-            prediction = self.__predict(p) 
+            prediction = self.predict(p)
             error += abs(prediction - p.coords[output_index]) / (abs(prediction) + 0.0000001)
         return error / len(points)
-
-    def compute_fit_accuracy(self, points):
-        # total sum of squares
-        ss_tot = self.__total_sum_squares(points)
-        # residual sum of squares
-        ss_res = self.__residual_sum_squares(points)
-        # coefficient of determination (R^2)
-        return 1 - (ss_res / ss_tot)
 
