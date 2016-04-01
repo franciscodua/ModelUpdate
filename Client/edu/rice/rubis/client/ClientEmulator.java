@@ -226,13 +226,6 @@ public class ClientEmulator
             }
         }
 
-        for (int i = 0; i < client.rubis.getNbOfClients(); i++)
-        {
-            sessions[i] =
-                    new UserSession("UserSession" + i, client.urlGen, client.rubis, stats);
-            sessions[i].start();
-        }
-
         // Start up-ramp
         client.setSlowDownFactor(client.rubis.getUpRampSlowdown());
 

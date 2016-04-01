@@ -775,7 +775,7 @@ public class UserSession extends Thread
             e.printStackTrace();
         }
 
-        while (!ClientEmulator.isEndOfSimulation() && System.currentTimeMillis() - startSession < duration)
+        while (!ClientEmulator.isEndOfSimulation())
         {
             // Select a random user for this session
             userId = rand.nextInt(rubis.getNbOfUsers());
