@@ -79,7 +79,6 @@ public class UserSession extends Thread
     // = everything!
 
     private int begin = 0;
-    private int duration = 0;
 
     /**
      * Creates a new <code>UserSession</code> instance.
@@ -109,7 +108,7 @@ public class UserSession extends Thread
     }
 
     public UserSession(String threadId, URLGenerator URLGen,
-                       RUBiSProperties RUBiS, Stats statistics, int begin, int duration)
+                       RUBiSProperties RUBiS, Stats statistics, int begin)
     {
         super(threadId);
         urlGen = URLGen;
@@ -127,8 +126,6 @@ public class UserSession extends Thread
             Runtime.getRuntime().exit(1);
 
         this.begin = begin;
-        this.duration = duration;
-
     }
 
     /**
