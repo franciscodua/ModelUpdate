@@ -1,6 +1,7 @@
-import sys
 import random
-from sklearn.cross_validation import train_test_split
+import sys
+
+from sklearn import cross_validation
 
 from cluster import Cluster
 
@@ -8,11 +9,33 @@ DEBUG = False
 N_TIMES = 100
 
 
+def avg(lst):
+    return sum(lst) / len(lst)
+
+
 def compute_mean_error(clusters):
     error = 0
     for c in clusters:
         error += c.error
     return error / len(clusters)
+
+
+def compute_test_error(clusters, points):
+    cluster_count = len(clusters)
+    error = 0
+
+    for point in points:
+        smallest_distance = clusters[0].centroid.get_error(point)
+        cluster_index = 0
+        for i in range(1, cluster_count):
+            distance = clusters[i].centroid.get_error(point)
+            if distance < smallest_distance:
+                smallest_distance = distance
+                cluster_index = i
+
+        error += smallest_distance / (abs(clusters[cluster_index].centroid.predict(point)) + 0.0000001)
+
+    return error / len(points)
 
 
 def kmeans(points, k, cutoff):
@@ -76,61 +99,59 @@ def kmeans(points, k, cutoff):
 
         # If the centroids have stopped moving much, say we're done!
         if biggest_shift < cutoff:
-            if DEBUG:
-                print "Converged after %s iterations" % loop_counter
             break
     return clusters
 
 
-def compute_test_error(clusters, points):
-    cluster_count = len(clusters)
-    error = 0
+def choose_k(points, cutoff=0.1):
+    kf = cross_validation.KFold(len(points), n_folds=10, shuffle=True)
+    validation_error = []
+    current_error = []
+    optimal_k = 1
+    clusters = []
+    # for k = 1
+    for train_index, test_index in kf:
+        train = [points[i] for i in train_index]
+        test = [points[i] for i in test_index]
+        clusters = kmeans(train, 1, cutoff)
+        current_error.append(compute_test_error(clusters, test))
+    validation_error.append(avg(current_error))
 
-    for point in points:
-        smallest_distance = clusters[0].centroid.get_error(point)
-        cluster_index = 0
-        for i in range(1, cluster_count):
-            distance = clusters[i].centroid.get_error(point)
-            if distance < smallest_distance:
-                smallest_distance = distance
-                cluster_index = i
+    for k in range(2, 31):
+        current_error = []
+        error = sys.maxint
+        for train_index, test_index in kf:
+            train = [points[i] for i in train_index]
+            test = [points[i] for i in test_index]
+            for i in range(N_TIMES):
+                new_clusters = kmeans(train, k, cutoff)
+                new_error = compute_mean_error(new_clusters)
+                if new_error < error:
+                    error = new_error
+                    clusters = new_clusters
 
-        error += smallest_distance / (abs(clusters[cluster_index].centroid.predict(point)) + 0.0000001)
+            current_error.append(compute_test_error(clusters, test))
 
-    return error / len(points)
+        validation_error.append(avg(current_error))
+        # stop if the validation error increases or if it is negligible
+        if validation_error[-2] < validation_error[-1]:
+            break
+
+        optimal_k = k
+        if validation_error[-1] < 0.05:
+            break
+
+    return optimal_k
 
 
 def fit_functions(points, cutoff=0.1):
-    validation_error = []
-    train, test = train_test_split(points, train_size=0.8)
-    # k = 1 has the same result every time
-    clusters = kmeans(train, 1, cutoff)
-    result_clusters = clusters
-    # error = compute_mean_error(clusters)
-    error = compute_mean_error(clusters)
-
-    validation_error.append(compute_test_error(clusters, test))
-    print "Error: " + str(validation_error[-1])
-    print "Clusters:"
-    for c in clusters:
-        print "- " + str(c.centroid)
-
-    # A max k must be defined (10 for the moment)
-    for k in range(2, 11):
-        error = sys.maxint
-        for i in range(N_TIMES):
-            new_clusters = kmeans(points, k, cutoff)
-            new_error = compute_mean_error(new_clusters)
-            if new_error < error:
-                error = new_error
-                clusters = new_clusters
-        validation_error.append(compute_test_error(clusters, test))
-        print "Error: " + str(validation_error[-1])
-        print "Clusters:"
-        for c in clusters:
-            print "- " + str(c.centroid)
-        # break if test_error increases
-        if validation_error[-2] < validation_error[-1]:
-            break
-        result_clusters = clusters
-    return validation_error, result_clusters
+    k = choose_k(points, cutoff)
+    error = sys.maxint
+    clusters = []
+    for i in range(2 * N_TIMES):
+        new_clusters = kmeans(points, k, cutoff)
+        new_error = compute_mean_error(new_clusters)
+        if new_error < error:
+            error = new_error
+            clusters = new_clusters
+    return clusters
