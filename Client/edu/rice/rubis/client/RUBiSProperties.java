@@ -219,6 +219,7 @@ public class RUBiSProperties
       foo = new Integer(getProperty("workload_number_of_columns"));
       nbOfColumns = foo.intValue();
       foo = new Integer(getProperty("workload_number_of_rows"));
+      nbOfRows = foo.intValue();
       foo = new Integer(getProperty("workload_maximum_number_of_transitions"));
       maxNbOfTransitions = foo.intValue();
       foo = new Integer(getProperty("workload_number_of_items_per_page"));

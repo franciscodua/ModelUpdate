@@ -41,10 +41,10 @@ def main():
 
     points = read_points_csv(input_file)
 
-    error_values, clusters = kmeans.fit_functions(points)
+    validation_error, clusters = kmeans.fit_functions(points)
 
-    for c in clusters:
-        print "Cluster: " + str(c.centroid) + ". Error: " + str(c.error)
+    # for c in clusters:
+        # print "Cluster: " + str(c.centroid)
 
     # graph.new_graph(clusters, output_graph)
     # graph.graph_cost(error_values, output_graph)

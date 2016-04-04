@@ -52,7 +52,6 @@ public class ClientEmulator
     private static boolean endOfSimulation = false;
     private List<Integer> nUsers = null;
     private List<Integer> uBegin = null;
-    private List<Integer> uDuration = null;
     private int numberOfUsers = 0;
 
     /**
@@ -75,13 +74,10 @@ public class ClientEmulator
                         rubis.useTPCWThinkTime());
         if (!transition.ReadExcelTextFile(rubis.getTransitionTable()))
             Runtime.getRuntime().exit(1);
-        else
-            transition.displayMatrix();
 
         // Init lists of number of users
         nUsers = new ArrayList<>();
         uBegin = new ArrayList<>();
-        uDuration = new ArrayList<>();
 
         try(BufferedReader br = new BufferedReader(new FileReader("usersFile.txt"))) {
             String current;
@@ -90,7 +86,6 @@ public class ClientEmulator
                 parts = current.split(" ");
                 nUsers.add(Integer.parseInt(parts[0]));
                 uBegin.add(Integer.parseInt(parts[1]));
-                uDuration.add(Integer.parseInt(parts[2]));
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -148,10 +143,6 @@ public class ClientEmulator
 
     public List<Integer> getuBegin() {
         return uBegin;
-    }
-
-    public List<Integer> getuDuration() {
-        return uDuration;
     }
 
     /**
@@ -220,17 +211,10 @@ public class ClientEmulator
         for (int i = 0; i < client.getnUsers().size(); i++) {
             for (int j = 0; j < client.getnUsers().get(i); j++) {
                 sessions[sessionN] = new UserSession("UserSession" + i, client.urlGen, client.rubis, stats,
-                        client.getuBegin().get(i), client.getuDuration().get(i));
+                        client.getuBegin().get(i));
                 sessions[sessionN].start();
                 sessionN++;
             }
-        }
-
-        for (int i = 0; i < client.rubis.getNbOfClients(); i++)
-        {
-            sessions[i] =
-                    new UserSession("UserSession" + i, client.urlGen, client.rubis, stats);
-            sessions[i].start();
         }
 
         // Start up-ramp
