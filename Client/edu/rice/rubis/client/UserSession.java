@@ -108,7 +108,7 @@ public class UserSession extends Thread
     }
 
     public UserSession(String threadId, URLGenerator URLGen,
-                       RUBiSProperties RUBiS, Stats statistics, int begin)
+                       RUBiSProperties RUBiS, Stats statistics, int begin, TransitionTable t)
     {
         super(threadId);
         urlGen = URLGen;
@@ -120,10 +120,9 @@ public class UserSession extends Thread
         // messages+HTML pages, 3 =
         // everything!
 
-        transition = new TransitionTable(rubis.getNbOfColumns(), rubis
-                .getNbOfRows(), statistics, rubis.useTPCWThinkTime());
-        if (!transition.ReadExcelTextFile(rubis.getTransitionTable()))
-            Runtime.getRuntime().exit(1);
+        transition = new TransitionTable(t.getNbColumns(), t.getNbRows(), t.getStats(),
+                t.isUseTPCWThinkTime());
+        transition.copy(t);
 
         this.begin = begin;
     }

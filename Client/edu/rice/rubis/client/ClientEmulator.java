@@ -197,6 +197,10 @@ public class ClientEmulator
         Stats stats = new Stats(client.rubis.getNbOfRows());
         UserSession[] sessions = new UserSession[client.getNumberOfUsers()];
 
+        TransitionTable transition = new TransitionTable(client.rubis.getNbOfColumns(), client.rubis
+                .getNbOfRows(), stats, client.rubis.useTPCWThinkTime());
+        if (!transition.ReadExcelTextFile(client.rubis.getTransitionTable()))
+            Runtime.getRuntime().exit(1);
 
         // #############################
         // ### TEST TRACE BEGIN HERE ###
@@ -211,7 +215,7 @@ public class ClientEmulator
         for (int i = 0; i < client.getnUsers().size(); i++) {
             for (int j = 0; j < client.getnUsers().get(i); j++) {
                 sessions[sessionN] = new UserSession("UserSession" + i, client.urlGen, client.rubis, stats,
-                        client.getuBegin().get(i));
+                        client.getuBegin().get(i),transition);
                 sessions[sessionN].start();
                 sessionN++;
             }
