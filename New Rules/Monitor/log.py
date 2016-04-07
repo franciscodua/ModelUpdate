@@ -10,6 +10,7 @@ class Log:
         self.n_items += 1
         if self.n_items >= 100:
             self.write()
+	print record
 
     def write(self):
         with open(self.file_name, 'a') as f:
