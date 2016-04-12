@@ -59,7 +59,7 @@ class HAProxyConnector:
         received = ""
 
         while received == "":
-            received = sock.recv(1024)
+            received = sock.recv(10000)
 
         sock.close()
 
