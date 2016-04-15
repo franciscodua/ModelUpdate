@@ -79,6 +79,7 @@ public class UserSession extends Thread
     // = everything!
 
     private int begin = 0;
+    private long numberRequests = 0;
 
     /**
      * Creates a new <code>UserSession</code> instance.
@@ -139,6 +140,7 @@ public class UserSession extends Thread
         BufferedInputStream in = null;
         InputStream urlStream = null;
         int retry = 0;
+        numberRequests ++;
 
         try
         {

@@ -50,9 +50,12 @@ public class ClientEmulator
     // URL generator corresponding to the version to be used (PHP, EJB or Servlets)
     private static float slowdownFactor = 0;
     private static boolean endOfSimulation = false;
+
+    // Added by FD
     private List<Integer> nUsers = null;
     private List<Integer> uBegin = null;
     private int numberOfUsers = 0;
+    private static long numberOfRequests = 0;
 
     /**
      * Creates a new <code>ClientEmulator</code> instance.
@@ -116,6 +119,10 @@ public class ClientEmulator
         return slowdownFactor;
     }
 
+    public static synchronized void addRequests(long requests) {
+        numberOfRequests += requests;
+    }
+
     /**
      * Set the end of the current simulation
      */
@@ -169,6 +176,10 @@ public class ClientEmulator
         Process[] remoteClient = null;
         String reportDir = "";
         String tmpDir = "/tmp/";
+
+        long startSession = 0;
+        long endSession = 0;
+
         boolean           isMainClient = (args.length <= 2); // Check if we are the main client
         String propertiesFileName;
 
@@ -210,6 +221,8 @@ public class ClientEmulator
                 "ClientEmulator: Starting "
                         + client.getNumberOfUsers()
                         + " session threads");
+
+        startSession = System.currentTimeMillis();
 
         int sessionN = 0;
         for (int i = 0; i < client.getnUsers().size(); i++) {
@@ -270,6 +283,12 @@ public class ClientEmulator
                         "ClientEmulator: Thread " + i + " has been interrupted.");
             }
         }
+        endSession = System.currentTimeMillis();
+
+        System.out.println("Session time: " + (endSession - startSession));
+
+        System.out.println("Request rate: " + (numberOfRequests / (endSession - startSession)));
+
         System.out.println("Done\n");
 
         Runtime.getRuntime().exit(0);
