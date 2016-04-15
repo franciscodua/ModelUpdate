@@ -287,7 +287,7 @@ public class ClientEmulator
 
         System.out.println("Session time: " + (endSession - startSession));
 
-        System.out.println("Request rate: " + (numberOfRequests / (endSession - startSession)));
+        System.out.println("Request rate: " + (numberOfRequests / (endSession - startSession) / 1000));
 
         System.out.println("Done\n");
 

@@ -140,7 +140,6 @@ public class UserSession extends Thread
         BufferedInputStream in = null;
         InputStream urlStream = null;
         int retry = 0;
-        numberRequests ++;
 
         try
         {
@@ -149,6 +148,7 @@ public class UserSession extends Thread
                 // Open the connexion
                 try
                 {
+                    numberRequests++;
                     urlStream = url.openStream();
                     in = new BufferedInputStream(urlStream, 4096);
                     //System.out.println("Thread "+this.getName()+": "+url);
@@ -837,6 +837,7 @@ public class UserSession extends Thread
                             + username + " aborted<br>");
             }
         }
+        ClientEmulator.addRequests(numberRequests);
     }
 
 }
