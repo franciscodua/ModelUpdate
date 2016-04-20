@@ -69,7 +69,6 @@ public class UserSession extends Thread
     // itemId cannot be
     // retrieved from the
     // current page
-    private Stats           stats;                       // Statistics to collect
     // errors, time, ...
     private int             debugLevel    = 0;           // 0 = no debug message,
 
@@ -87,15 +86,13 @@ public class UserSession extends Thread
      * @param threadId a thread identifier
      * @param URLGen the URLGenerator to use
      * @param RUBiS rubis.properties
-     * @param statistics where to collect statistics
      */
     public UserSession(String threadId, URLGenerator URLGen,
-                       RUBiSProperties RUBiS, Stats statistics)
+                       RUBiSProperties RUBiS)
     {
         super(threadId);
         urlGen = URLGen;
         rubis = RUBiS;
-        stats = statistics;
         debugLevel = rubis.getMonitoringDebug(); // debugging level: 0 = no debug
         // message, 1 = just error
         // messages, 2 = error
@@ -103,25 +100,24 @@ public class UserSession extends Thread
         // everything!
 
         transition = new TransitionTable(rubis.getNbOfColumns(), rubis
-                .getNbOfRows(), statistics, rubis.useTPCWThinkTime());
+                .getNbOfRows(), rubis.useTPCWThinkTime());
         if (!transition.ReadExcelTextFile(rubis.getTransitionTable()))
             Runtime.getRuntime().exit(1);
     }
 
     public UserSession(String threadId, URLGenerator URLGen,
-                       RUBiSProperties RUBiS, Stats statistics, int begin, TransitionTable t)
+                       RUBiSProperties RUBiS, int begin, TransitionTable t)
     {
         super(threadId);
         urlGen = URLGen;
         rubis = RUBiS;
-        stats = statistics;
         debugLevel = rubis.getMonitoringDebug(); // debugging level: 0 = no debug
         // message, 1 = just error
         // messages, 2 = error
         // messages+HTML pages, 3 =
         // everything!
 
-        transition = new TransitionTable(t.getNbColumns(), t.getNbRows(), t.getStats(),
+        transition = new TransitionTable(t.getNbColumns(), t.getNbRows(),
                 t.isUseTPCWThinkTime());
         transition.copy(t);
 
@@ -795,7 +791,6 @@ public class UserSession extends Thread
                 lastURL = computeURLFromState(next);
                 time = System.currentTimeMillis();
                 lastHTMLReply = callHTTPServer(lastURL);
-                stats.updateTime(next, System.currentTimeMillis() - time);
                 if (lastHTMLReply == null)
                 {
                     if (debugLevel > 0)
@@ -810,7 +805,6 @@ public class UserSession extends Thread
                     if (debugLevel > 0)
                         System.out.println("Thread " + this.getName()
                                 + ": Error returned from access to " + lastURL + "<br>");
-                    stats.incrementError(next);
                     if (debugLevel > 1)
                         System.out.println("Thread " + this.getName()
                                 + ": HTML reply was: " + lastHTMLReply + "<br>");
@@ -828,7 +822,6 @@ public class UserSession extends Thread
                             + username + " successfully ended<br>");
                 endSession = System.currentTimeMillis();
                 long sessionTime = endSession - startSession;
-                stats.addSessionTime(sessionTime);
             }
             else
             {

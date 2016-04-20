@@ -29,12 +29,6 @@ import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import edu.rice.rubis.client.RUBiSProperties;
-import edu.rice.rubis.client.Stats;
-import edu.rice.rubis.client.TransitionTable;
-import edu.rice.rubis.client.URLGenerator;
-import edu.rice.rubis.client.UserSession;
-
 /**
  * RUBiS client emulator.
  * This class plays random user sessions emulating a Web browser.
@@ -73,7 +67,6 @@ public class ClientEmulator
                 new TransitionTable(
                         rubis.getNbOfColumns(),
                         rubis.getNbOfRows(),
-                        null,
                         rubis.useTPCWThinkTime());
         if (!transition.ReadExcelTextFile(rubis.getTransitionTable()))
             Runtime.getRuntime().exit(1);
@@ -160,22 +153,6 @@ public class ClientEmulator
      */
     public static void main(String[] args)
     {
-        GregorianCalendar startDate;
-        GregorianCalendar endDate;
-        GregorianCalendar upRampDate;
-        GregorianCalendar runSessionDate;
-        GregorianCalendar downRampDate;
-        GregorianCalendar endDownRampDate;
-        Process webServerMonitor = null;
-        Process cjdbcServerMonitor = null;
-        Process[]         dbServerMonitor = null;
-        Process[]         ejbServerMonitor = null;
-        Process[]         servletsServerMonitor = null;
-        Process clientMonitor;
-        Process[] remoteClientMonitor = null;
-        Process[] remoteClient = null;
-        String reportDir = "";
-        String tmpDir = "/tmp/";
 
         long startSession = 0;
         long endSession = 0;
@@ -198,18 +175,16 @@ public class ClientEmulator
         {
             System.out.println(
                     "RUBiS remote client emulator - (C) Rice University/INRIA 2001\n");
-            startDate = new GregorianCalendar();
             propertiesFileName = args[2];
         }
 
         ClientEmulator client = new ClientEmulator(propertiesFileName);
         // Get also rubis.properties info
 
-        Stats stats = new Stats(client.rubis.getNbOfRows());
         UserSession[] sessions = new UserSession[client.getNumberOfUsers()];
 
         TransitionTable transition = new TransitionTable(client.rubis.getNbOfColumns(), client.rubis
-                .getNbOfRows(), stats, client.rubis.useTPCWThinkTime());
+                .getNbOfRows(), client.rubis.useTPCWThinkTime());
         if (!transition.ReadExcelTextFile(client.rubis.getTransitionTable()))
             Runtime.getRuntime().exit(1);
 
@@ -227,7 +202,7 @@ public class ClientEmulator
         int sessionN = 0;
         for (int i = 0; i < client.getnUsers().size(); i++) {
             for (int j = 0; j < client.getnUsers().get(i); j++) {
-                sessions[sessionN] = new UserSession("UserSession" + i, client.urlGen, client.rubis, stats,
+                sessions[sessionN] = new UserSession("UserSession" + i, client.urlGen, client.rubis,
                         client.getuBegin().get(i),transition);
                 sessions[sessionN].start();
                 sessionN++;
@@ -271,6 +246,7 @@ public class ClientEmulator
         // Wait for completion
         client.setEndOfSimulation();
         System.out.println("ClientEmulator: Shutting down threads ...");
+        endSession = System.currentTimeMillis();
         for (int i = 0; i < client.rubis.getNbOfClients(); i++)
         {
             try
@@ -283,11 +259,9 @@ public class ClientEmulator
                         "ClientEmulator: Thread " + i + " has been interrupted.");
             }
         }
-        endSession = System.currentTimeMillis();
-
         System.out.println("Session time: " + (endSession - startSession));
 
-        System.out.println("Request rate: " + (numberOfRequests / (endSession - startSession) / 1000));
+        System.out.println("Request rate: " + (numberOfRequests / (endSession - startSession) / 1000.0));
 
         System.out.println("Done\n");
 

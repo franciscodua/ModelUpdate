@@ -98,18 +98,16 @@ public class TransitionTable
     private Random rand = new Random();
     private Stack  previousStates = new Stack();
     private int    currentState = 0;
-    private Stats  stats;
     private boolean useTPCWThinkTime;
     private static String[] stateNames;
 
     /**
      * Creates a new <code>TransitionTable</code> instance.
      */
-    public TransitionTable(int columns, int rows, Stats statistics, boolean UseTPCWThinkTime)
+    public TransitionTable(int columns, int rows, boolean UseTPCWThinkTime)
     {
         nbColumns = columns;
         nbRows = rows;
-        stats = statistics;
         transitions = new float[nbColumns][nbRows];
         transitionsTime = new int[nbRows];
         useTPCWThinkTime = UseTPCWThinkTime;
@@ -147,10 +145,6 @@ public class TransitionTable
         return nbRows;
     }
 
-    public Stats getStats() {
-        return stats;
-    }
-
     public float[][] getTransitions() {
         return transitions;
     }
@@ -180,7 +174,6 @@ public class TransitionTable
     public void resetToInitialState()
     {
         currentState = 0;
-        stats.incrementCount(currentState);
     }
 
 
@@ -292,7 +285,6 @@ public class TransitionTable
             else
             { // Back adds both stats of back and new state but only sleep "back waiting time"
                 // and return the new state (after back).
-                stats.incrementCount(currentState); // Add back state stat
                 try
                 {
                     if (useTPCWThinkTime)
@@ -307,7 +299,6 @@ public class TransitionTable
                 Integer previous = (Integer)previousStates.pop();
                 currentState = previous.intValue();
 //        System.out.println("Thread "+Thread.currentThread().getName()+": Going back from "+stateNames[beforeStep]+" to "+stateNames[currentState]+"<br>\n");
-                stats.incrementCount(currentState); // Add new state stat
                 return currentState;
             }
         }
@@ -322,7 +313,6 @@ public class TransitionTable
 //        System.out.println("Thread "+Thread.currentThread().getName()+": "+stateNames[beforeStep]+" -> "+stateNames[currentState]+"<br>\n");
             }
         }
-        stats.incrementCount(currentState);
         try
         {
             if (useTPCWThinkTime)
