@@ -4,7 +4,7 @@ include config.mk
 #       Client     #
 ####################
 
-ClientFiles = URLGenerator URLGeneratorEJB URLGeneratorServlets URLGeneratorPHP RUBiSProperties Stats \
+ClientFiles = URLGenerator URLGeneratorEJB URLGeneratorServlets URLGeneratorPHP RUBiSProperties \
 	      TransitionTable ClientEmulator UserSession
 	    
 
