@@ -26,7 +26,6 @@ package edu.rice.rubis.client;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 /**
@@ -50,6 +49,7 @@ public class ClientEmulator
     private List<Integer> uBegin = null;
     private int numberOfUsers = 0;
     private static long numberOfRequests = 0;
+    private static long responseTime = 0;
 
     /**
      * Creates a new <code>ClientEmulator</code> instance.
@@ -112,8 +112,9 @@ public class ClientEmulator
         return slowdownFactor;
     }
 
-    public static synchronized void addRequests(long requests) {
+    public static synchronized void addRequests(long requests, long responseTimeSum) {
         numberOfRequests += requests;
+        responseTime += responseTimeSum;
     }
 
     /**
@@ -197,8 +198,6 @@ public class ClientEmulator
                         + client.getNumberOfUsers()
                         + " session threads");
 
-        startSession = System.currentTimeMillis();
-
         int sessionN = 0;
         for (int i = 0; i < client.getnUsers().size(); i++) {
             for (int j = 0; j < client.getnUsers().get(i); j++) {
@@ -221,6 +220,7 @@ public class ClientEmulator
             System.err.println("ClientEmulator has been interrupted.");
         }
 
+        startSession = System.currentTimeMillis();
         client.setSlowDownFactor(1);
 
         try
@@ -233,6 +233,7 @@ public class ClientEmulator
         }
 
         client.setSlowDownFactor(client.rubis.getDownRampSlowdown());
+        endSession = System.currentTimeMillis();
 
         try
         {
@@ -246,7 +247,7 @@ public class ClientEmulator
         // Wait for completion
         client.setEndOfSimulation();
         System.out.println("ClientEmulator: Shutting down threads ...");
-        endSession = System.currentTimeMillis();
+
         for (int i = 0; i < client.rubis.getNbOfClients(); i++)
         {
             try
@@ -259,11 +260,36 @@ public class ClientEmulator
                         "ClientEmulator: Thread " + i + " has been interrupted.");
             }
         }
+        // collect stats
+        double requestRate = (double) numberOfRequests / ((endSession - startSession) / 1000.0);
+        double avgResponseTime = (responseTime / 1000.0) / numberOfRequests;
         System.out.println("Session time: " + (endSession - startSession));
 
-        System.out.println("Request rate: " + (numberOfRequests / (endSession - startSession) / 1000.0));
+        System.out.println("Requests: " + numberOfRequests);
+
+        System.out.println("Request rate: " + requestRate);
+        System.out.println("Average Response Time: " + avgResponseTime);
 
         System.out.println("Done\n");
+        BufferedWriter bw = null;
+
+        // write data to log.txt
+        try {
+            bw = new BufferedWriter(new FileWriter("log.txt", true));
+            bw.write("" + requestRate + ", " + avgResponseTime);
+            bw.newLine();
+            bw.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if(bw != null) {
+                try {
+                    bw.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
 
         Runtime.getRuntime().exit(0);
     }

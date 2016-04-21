@@ -79,6 +79,7 @@ public class UserSession extends Thread
 
     private int begin = 0;
     private long numberRequests = 0;
+    private long responseTimeSum = 0;
 
     /**
      * Creates a new <code>UserSession</code> instance.
@@ -125,6 +126,18 @@ public class UserSession extends Thread
     }
 
     /**
+     * Increase the number of requests made. Requests should only be increased if the
+     * slowdown factor is 1 (not in ramp up or ramp down phases)
+     */
+    private void increaseRequests(long responseTime) {
+        // TODO: getSlowDownFactor is synchronized
+        if(ClientEmulator.getSlowDownFactor() == 1) {
+            numberRequests += 1;
+            responseTimeSum += responseTime;
+        }
+    }
+
+    /**
      * Call the HTTP Server according to the given URL and get the reply
      *
      * @param url URL to access
@@ -136,6 +149,8 @@ public class UserSession extends Thread
         BufferedInputStream in = null;
         InputStream urlStream = null;
         int retry = 0;
+        long startRequest = 0;
+        long endRequest;
 
         try
         {
@@ -144,7 +159,8 @@ public class UserSession extends Thread
                 // Open the connexion
                 try
                 {
-                    numberRequests++;
+                    //increaseRequests();
+                    startRequest = System.currentTimeMillis();
                     urlStream = url.openStream();
                     in = new BufferedInputStream(urlStream, 4096);
                     //System.out.println("Thread "+this.getName()+": "+url);
@@ -200,6 +216,9 @@ public class UserSession extends Thread
         }
         finally
         {
+            // add request made for html page
+            endRequest = System.currentTimeMillis();
+            increaseRequests(endRequest - startRequest);
             try
             {
                 if (in != null)
@@ -238,12 +257,15 @@ public class UserSession extends Thread
             URL imageURL = urlGen.genericHTMLFile((String) images.elementAt(0));
             try
             {
+                startRequest = System.currentTimeMillis();
                 InputStream imageStream = imageURL.openStream();
                 BufferedInputStream inImage = new BufferedInputStream(imageStream, 4096);
                 while (inImage.read(buffer, 0, buffer.length) != -1)
                     ; // Just download, skip data
+                endRequest = System.currentTimeMillis();
                 inImage.close();
                 imageStream.close();
+                increaseRequests(endRequest - startRequest);
             }
             catch (IOException ioe)
             {
@@ -759,9 +781,6 @@ public class UserSession extends Thread
     {
         int nbOfTransitions = 0;
         int next = 0;
-        long time = 0;
-        long startSession = 0;
-        long endSession = 0;
 
         try {
             Thread.currentThread().sleep(begin);
@@ -779,7 +798,6 @@ public class UserSession extends Thread
             if (debugLevel > 2)
                 System.out.println("Thread " + this.getName()
                         + ": Starting a new user session for " + username + " ...<br>");
-            startSession = System.currentTimeMillis();
             // Start from Home Page
             transition.resetToInitialState();
             next = transition.getCurrentState();
@@ -789,7 +807,6 @@ public class UserSession extends Thread
                 // Compute next step and call HTTP server (also measure time spend in
                 // server call)
                 lastURL = computeURLFromState(next);
-                time = System.currentTimeMillis();
                 lastHTMLReply = callHTTPServer(lastURL);
                 if (lastHTMLReply == null)
                 {
@@ -820,8 +837,6 @@ public class UserSession extends Thread
                 if (debugLevel > 2)
                     System.out.println("Thread " + this.getName() + ": Session of "
                             + username + " successfully ended<br>");
-                endSession = System.currentTimeMillis();
-                long sessionTime = endSession - startSession;
             }
             else
             {
@@ -830,7 +845,7 @@ public class UserSession extends Thread
                             + username + " aborted<br>");
             }
         }
-        ClientEmulator.addRequests(numberRequests);
+        ClientEmulator.addRequests(numberRequests, responseTimeSum);
     }
 
 }
