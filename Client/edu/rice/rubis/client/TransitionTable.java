@@ -289,8 +289,10 @@ public class TransitionTable
                 // and return the new state (after back).
                 try
                 {
-                    if (useTPCWThinkTime)
-                        Thread.currentThread().sleep((long)max(((float)TPCWthinkTime()*ClientEmulator.getSlowDownFactor()) - lastRequestTime), 0);
+                    if (useTPCWThinkTime) {
+                        long t = (long) ((float) TPCWthinkTime() * ClientEmulator.getSlowDownFactor()) - lastRequestTime;
+                        Thread.currentThread().sleep((t < 0)? 0:t);
+                    }
                     else
                         Thread.currentThread().sleep((long)((float)transitionsTime[currentState]*ClientEmulator.getSlowDownFactor()));
                 }
@@ -317,8 +319,10 @@ public class TransitionTable
         }
         try
         {
-            if (useTPCWThinkTime)
-                Thread.currentThread().sleep((long)max(((float)TPCWthinkTime()*ClientEmulator.getSlowDownFactor()) - lastRequestTime), 0);
+            if (useTPCWThinkTime) {
+                long t = (long) ((float) TPCWthinkTime() * ClientEmulator.getSlowDownFactor()) - lastRequestTime;
+                Thread.currentThread().sleep((t < 0)? 0:t);
+            }
             else
                 Thread.currentThread().sleep((long)((float)transitionsTime[currentState]*ClientEmulator.getSlowDownFactor()));
         }
