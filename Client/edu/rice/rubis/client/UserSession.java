@@ -80,6 +80,7 @@ public class UserSession extends Thread
     private int begin = 0;
     private long numberRequests = 0;
     private long responseTimeSum = 0;
+    private long lastRequestTime = 0;
 
     /**
      * Creates a new <code>UserSession</code> instance.
@@ -218,7 +219,8 @@ public class UserSession extends Thread
         {
             // add request made for html page
             endRequest = System.currentTimeMillis();
-            increaseRequests(endRequest - startRequest);
+            lastRequestTime = endRequest - startRequest;
+            increaseRequests(lastRequestTime);
             try
             {
                 if (in != null)
@@ -829,7 +831,7 @@ public class UserSession extends Thread
                     next = transition.getCurrentState();
                 }
                 else
-                    next = transition.nextState();
+                    next = transition.nextState(lastRequestTime);
                 nbOfTransitions--;
             }
             if ((transition.isEndOfSession()) || (nbOfTransitions == 0))

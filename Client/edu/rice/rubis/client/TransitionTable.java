@@ -33,6 +33,8 @@ import java.util.NoSuchElementException;
 import java.util.Random;
 import java.util.Stack;
 
+import static jdk.nashorn.internal.objects.NativeMath.max;
+
 /**
  * This class provides support for transitions between RUBiS web site pages.
  * A matrix contains probabilities of transition from one state to another.
@@ -261,7 +263,7 @@ public class TransitionTable
      *
      * @return value of the next state
      */
-    public int nextState()
+    public int nextState(long lastRequestTime)
     {
         int   beforeStep = currentState;
         float step = rand.nextFloat();
@@ -288,7 +290,7 @@ public class TransitionTable
                 try
                 {
                     if (useTPCWThinkTime)
-                        Thread.currentThread().sleep((long)((float)TPCWthinkTime()*ClientEmulator.getSlowDownFactor()));
+                        Thread.currentThread().sleep((long)max(((float)TPCWthinkTime()*ClientEmulator.getSlowDownFactor()) - lastRequestTime), 0);
                     else
                         Thread.currentThread().sleep((long)((float)transitionsTime[currentState]*ClientEmulator.getSlowDownFactor()));
                 }
@@ -316,7 +318,7 @@ public class TransitionTable
         try
         {
             if (useTPCWThinkTime)
-                Thread.currentThread().sleep((long)((float)TPCWthinkTime()*ClientEmulator.getSlowDownFactor()));
+                Thread.currentThread().sleep((long)max(((float)TPCWthinkTime()*ClientEmulator.getSlowDownFactor()) - lastRequestTime), 0);
             else
                 Thread.currentThread().sleep((long)((float)transitionsTime[currentState]*ClientEmulator.getSlowDownFactor()));
         }
