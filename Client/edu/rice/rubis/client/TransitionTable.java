@@ -24,16 +24,14 @@
 package edu.rice.rubis.client;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
-import java.lang.NumberFormatException;
-import java.util.StringTokenizer;
 import java.util.NoSuchElementException;
 import java.util.Random;
 import java.util.Stack;
+import java.util.StringTokenizer;
 
-import static jdk.nashorn.internal.objects.NativeMath.max;
 
 /**
  * This class provides support for transitions between RUBiS web site pages.
@@ -92,6 +90,7 @@ import static jdk.nashorn.internal.objects.NativeMath.max;
 
 public class TransitionTable
 {
+    private static String[] stateNames;
     private int    nbColumns;
     private int    nbRows;
     private float  transitions[][];
@@ -101,7 +100,6 @@ public class TransitionTable
     private Stack  previousStates = new Stack();
     private int    currentState = 0;
     private boolean useTPCWThinkTime;
-    private static String[] stateNames;
 
     /**
      * Creates a new <code>TransitionTable</code> instance.
@@ -115,15 +113,28 @@ public class TransitionTable
         useTPCWThinkTime = UseTPCWThinkTime;
     }
 
+    public static String[] getStateNames() {
+        return stateNames;
+    }
+
+    /**
+     * Return a state name
+     *
+     * @return current state name
+     */
+    public static String getStateName(int state) {
+        return stateNames[state];
+    }
+
     public void copy(TransitionTable t) {
         float[][] transitions = t.getTransitions();
         int[] transitionTime = t.getTransitionsTime();
         this.tableName = t.getTableName();
-        String [] stateNames = t.getStateNames();
+        String[] stateNames = getStateNames();
 
-        this.stateNames = new String[nbRows];
+        TransitionTable.stateNames = new String[nbRows];
         for (int i = 0; i < nbRows; i++) {
-            this.stateNames[i] = stateNames[i];
+            TransitionTable.stateNames[i] = stateNames[i];
         }
         for (int i = 0 ; i < nbRows ; i++)
         {
@@ -135,8 +146,9 @@ public class TransitionTable
         }
     }
 
-    public static String[] getStateNames() {
-        return stateNames;
+    private long getSleepTime(long sleepTime, long lastRequestTime) {
+        long sleep = sleepTime - lastRequestTime;
+        return (sleep < 0) ? 0 : sleep;
     }
 
     public int getNbColumns() {
@@ -169,7 +181,6 @@ public class TransitionTable
         return tableName;
     }
 
-
     /**
      * Resets the current state to initial state (home page).
      */
@@ -177,7 +188,6 @@ public class TransitionTable
     {
         currentState = 0;
     }
-
 
     /**
      * Return the current state value (row index).
@@ -188,7 +198,6 @@ public class TransitionTable
     {
         return currentState;
     }
-
 
     /**
      * Return the previous state value (row index).
@@ -205,7 +214,6 @@ public class TransitionTable
             return state.intValue();
         }
     }
-
 
     /**
      * Go back to the previous state and return the value of the new state
@@ -224,7 +232,6 @@ public class TransitionTable
         }
     }
 
-
     /**
      * Returns true if the 'End of Session' state has been reached
      *
@@ -235,7 +242,6 @@ public class TransitionTable
         return currentState == (nbRows-1);
     }
 
-
     /**
      * Return the current state name
      *
@@ -245,18 +251,6 @@ public class TransitionTable
     {
         return stateNames[currentState];
     }
-
-
-    /**
-     * Return a state name
-     *
-     * @return current state name
-     */
-    public static String getStateName(int state)
-    {
-        return stateNames[state];
-    }
-
 
     /**
      * Compute a next state from current state according to transition matrix.
@@ -269,6 +263,7 @@ public class TransitionTable
         float step = rand.nextFloat();
         float cumul = 0;
         int   i;
+        long t;
 
         for (i = 0 ; i < nbRows ; i++)
         {
@@ -290,11 +285,12 @@ public class TransitionTable
                 try
                 {
                     if (useTPCWThinkTime) {
-                        long t = (long) ((float) TPCWthinkTime() * ClientEmulator.getSlowDownFactor()) - lastRequestTime;
-                        Thread.currentThread().sleep((t < 0)? 0:t);
+                        t = getSleepTime((long) ((float) TPCWthinkTime() * ClientEmulator.getSlowDownFactor()), lastRequestTime);
+                    } else {
+                        t = getSleepTime((long) ((float) transitionsTime[currentState] * ClientEmulator.getSlowDownFactor()), lastRequestTime);
                     }
-                    else
-                        Thread.currentThread().sleep((long)((float)transitionsTime[currentState]*ClientEmulator.getSlowDownFactor()));
+
+                    Thread.currentThread().sleep(t);
                 }
                 catch (InterruptedException ie)
                 {
@@ -320,11 +316,12 @@ public class TransitionTable
         try
         {
             if (useTPCWThinkTime) {
-                long t = (long) ((float) TPCWthinkTime() * ClientEmulator.getSlowDownFactor()) - lastRequestTime;
-                Thread.currentThread().sleep((t < 0)? 0:t);
+                t = getSleepTime((long) ((float) TPCWthinkTime() * ClientEmulator.getSlowDownFactor()), lastRequestTime);
             }
             else
-                Thread.currentThread().sleep((long)((float)transitionsTime[currentState]*ClientEmulator.getSlowDownFactor()));
+                t = getSleepTime((long) ((float) transitionsTime[currentState] * ClientEmulator.getSlowDownFactor()), lastRequestTime);
+
+            Thread.currentThread().sleep(t);
         }
         catch (InterruptedException ie)
         {
@@ -439,9 +436,9 @@ public class TransitionTable
     private long TPCWthinkTime()
     {
         double r = rand.nextDouble();
-        if (r < (double)4.54e-5)
+        if (r < 4.54e-5)
             return ((long) (r+0.5));
-        return  ((long) ((((double)-7000.0)*Math.log(r))+0.5));
+        return ((long) ((-7000.0 * Math.log(r)) + 0.5));
     }
 
 }
