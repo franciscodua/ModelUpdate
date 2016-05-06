@@ -38,18 +38,17 @@ import java.util.List;
  */
 public class ClientEmulator
 {
-    private RUBiSProperties rubis = null; // access to rubis.properties file
-    private URLGenerator urlGen = null;
     // URL generator corresponding to the version to be used (PHP, EJB or Servlets)
     private static float slowdownFactor = 0;
     private static boolean endOfSimulation = false;
-
+    private static long numberOfRequests = 0;
+    private static long responseTime = 0;
+    private RUBiSProperties rubis = null; // access to rubis.properties file
+    private URLGenerator urlGen = null;
     // Added by FD
     private List<Integer> nUsers = null;
     private List<Integer> uBegin = null;
     private int numberOfUsers = 0;
-    private static long numberOfRequests = 0;
-    private static long responseTime = 0;
 
     /**
      * Creates a new <code>ClientEmulator</code> instance.
@@ -93,16 +92,6 @@ public class ClientEmulator
     }
 
     /**
-     * Updates the slowdown factor.
-     *
-     * @param newValue new slowdown value
-     */
-    private synchronized void setSlowDownFactor(float newValue)
-    {
-        slowdownFactor = newValue;
-    }
-
-    /**
      * Get the slowdown factor corresponding to current ramp (up, session or down).
      *
      * @return slowdown factor of current ramp
@@ -112,17 +101,19 @@ public class ClientEmulator
         return slowdownFactor;
     }
 
+    /**
+     * Updates the slowdown factor.
+     *
+     * @param newValue new slowdown value
+     */
+    private synchronized void setSlowDownFactor(float newValue)
+    {
+        slowdownFactor = newValue;
+    }
+
     public static synchronized void addRequests(long requests, long responseTimeSum) {
         numberOfRequests += requests;
         responseTime += responseTimeSum;
-    }
-
-    /**
-     * Set the end of the current simulation
-     */
-    private synchronized void setEndOfSimulation()
-    {
-        endOfSimulation = true;
     }
 
     /**
@@ -132,18 +123,6 @@ public class ClientEmulator
     public static synchronized boolean isEndOfSimulation()
     {
         return endOfSimulation;
-    }
-
-    public int getNumberOfUsers() {
-        return numberOfUsers;
-    }
-
-    public List<Integer> getnUsers() {
-        return nUsers;
-    }
-
-    public List<Integer> getuBegin() {
-        return uBegin;
     }
 
     /**
@@ -248,7 +227,7 @@ public class ClientEmulator
         client.setEndOfSimulation();
         System.out.println("ClientEmulator: Shutting down threads ...");
 
-        for (int i = 0; i < client.rubis.getNbOfClients(); i++)
+        for (int i = 0; i < client.getNumberOfUsers(); i++)
         {
             try
             {
@@ -292,6 +271,25 @@ public class ClientEmulator
         }
 
         Runtime.getRuntime().exit(0);
+    }
+
+    /**
+     * Set the end of the current simulation
+     */
+    private synchronized void setEndOfSimulation() {
+        endOfSimulation = true;
+    }
+
+    public int getNumberOfUsers() {
+        return numberOfUsers;
+    }
+
+    public List<Integer> getnUsers() {
+        return nUsers;
+    }
+
+    public List<Integer> getuBegin() {
+        return uBegin;
     }
 
 }
