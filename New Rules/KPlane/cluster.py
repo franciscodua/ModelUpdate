@@ -71,7 +71,8 @@ class Cluster:
 
         regr.fit(input_array, output_array)
 
-        point_coords = [x[0] for x in regr.coef_.tolist()]
+        point_coords = [x for x in regr.coef_.tolist()[0]]
+
         point_coords.append(regr.intercept_.tolist()[0])
 
         return Function(point_coords)
