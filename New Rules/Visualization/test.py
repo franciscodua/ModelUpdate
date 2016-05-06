@@ -44,7 +44,12 @@ def main():
     clusters = kmeans.fit_functions(points)
 
     for c in clusters:
-        print "Cluster: " + str(c.centroid)
+        print "Regra: "
+        print "\tCluster: " + str(c.centroid)
+        # prints ranges of values from different dimensions, except output
+        for dim in range(c.n - 1):
+            values = [p.coords[dim] for p in c.points]
+            print "\t\tDim " + str(dim) + ": " + "(" + str(min(values)) + ", " + str(max(values)) + ")"
 
     # graph.new_graph(clusters, output_graph)
     # graph.graph_cost(error_values, output_graph)
