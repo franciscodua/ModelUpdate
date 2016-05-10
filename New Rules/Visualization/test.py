@@ -51,6 +51,7 @@ def main():
             values = [p.coords[dim] for p in c.points]
             print "\t\tDim " + str(dim) + ": " + "(" + str(min(values)) + ", " + str(max(values)) + ")"
 
+    print "Average Accuracy: " + str((1 - kmeans.compute_mean_error(clusters)))
     # graph.new_graph(clusters, output_graph)
     # graph.graph_cost(error_values, output_graph)
 
