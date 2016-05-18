@@ -33,7 +33,7 @@ def compute_test_error(clusters, points):
                 smallest_distance = distance
                 cluster_index = i
 
-        error += smallest_distance / (abs(clusters[cluster_index].centroid.predict(point)) + 0.0000001)
+        error += smallest_distance / (abs(clusters[cluster_index].centroid.predict(point)))
 
     return error / len(points)
 
@@ -116,6 +116,8 @@ def choose_k(points, cutoff=0.1):
         clusters = kmeans(train, 1, cutoff)
         current_error.append(compute_test_error(clusters, test))
     validation_error.append(avg(current_error))
+    if validation_error[-1] < 0.05:
+        return 1
 
     for k in range(2, 31):
         current_error = []

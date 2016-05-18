@@ -1,3 +1,4 @@
 from Visualization import test
 
-test.main()
+# test.main()
+test.test_accu()

@@ -56,5 +56,21 @@ def main():
     # graph.graph_cost(error_values, output_graph)
 
 
+def test_accu():
+    train_file = sys.argv[1]
+    test_file = sys.argv[2]
+
+    train_set = read_points_csv(train_file)
+    test_set = read_points_csv(test_file)
+
+    current_set = train_set[:9]
+    train_set = train_set[9:]
+
+    for p in train_set:
+        current_set.append(p)
+        clusters = kmeans.fit_functions(current_set)
+        print kmeans.compute_test_error(clusters, test_set)
+
 if __name__ == "__main__":
-    main()
+    # main()
+    test_accu()
