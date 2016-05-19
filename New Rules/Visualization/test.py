@@ -1,6 +1,9 @@
 import csv
+import random
 import sys
 import warnings
+
+from sklearn import cross_validation
 
 from KPlane import kmeans
 from KPlane.objects import Point
@@ -57,19 +60,35 @@ def main():
 
 
 def test_accu():
-    train_file = sys.argv[1]
-    test_file = sys.argv[2]
+    warnings.filterwarnings("ignore")
+    input_file = sys.argv[1]
+    output_file = sys.argv[2]
 
-    train_set = read_points_csv(train_file)
-    test_set = read_points_csv(test_file)
+    dataset = read_points_csv(input_file)
 
-    current_set = train_set[:9]
-    train_set = train_set[9:]
+    for size in range(20, int(len(dataset) * 0.9), 5):
 
-    for p in train_set:
-        current_set.append(p)
-        clusters = kmeans.fit_functions(current_set)
-        print kmeans.compute_test_error(clusters, test_set)
+        kf = cross_validation.KFold(len(dataset), n_folds=10, shuffle=False)
+        test_error = []
+        for train_index, test_index in kf:
+            train = [dataset[i] for i in train_index]
+            test = [dataset[i] for i in test_index]
+            train_error = []
+
+            for i in range(5):
+                clusters = kmeans.fit_functions(random.sample(train, size))
+                train_error.append(kmeans.compute_test_error(clusters, test))
+
+            test_error.append(kmeans.avg(train_error))
+        with open(output_file, 'a') as f:
+            f.write(str(size) + ', ' + str(kmeans.avg(test_error)) + '\n')
+        print(str(kmeans.avg(test_error)))
+
+
+        # for p in train_set:
+        #     current_set.append(p)
+        #     clusters = kmeans.fit_functions(current_set)
+        #     print kmeans.compute_test_error(clusters, test_set)
 
 if __name__ == "__main__":
     # main()
