@@ -2,7 +2,6 @@ import csv
 import random
 import sys
 import warnings
-
 from sklearn import cross_validation
 
 from KPlane import kmeans
@@ -140,6 +139,8 @@ def speed():
     train_points = read_points_csv(train_file)
     test_points = read_points_csv(test_file)
 
+    l = len(test_points) / 2
+
     for i in range(0, len(test_points) / 2, 5):
         train_points.extend(test_points[0:i])
         test_points = test_points[i:]
@@ -148,7 +149,6 @@ def speed():
 
         with open(output_file, 'a') as f:
             f.write(str(i) + ', ' + str(test_error) + '\n')
-
 
 
 if __name__ == "__main__":
