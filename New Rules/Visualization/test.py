@@ -150,6 +150,34 @@ def speed():
         with open(output_file, 'a') as f:
             f.write(str(i) + ', ' + str(test_error) + '\n')
 
+def test_acc_speed():
+    warnings.filterwarnings("ignore")
+    generated_file = sys.argv[1]
+    dataset_file = sys.argv[2]
+    output_file = sys.argv[3]
+
+    generated = read_points_csv(generated_file)
+    dataset = read_points_csv(dataset_file)
+
+    for size in range(0, 305, 5):
+        kf = cross_validation.KFold(len(dataset), n_folds=10, shuffle=False)
+        test_error = []
+        for train_index, test_index in kf:
+            train = [dataset[i] for i in train_index]
+            test = [dataset[i] for i in test_index]
+            train_error = []
+
+            for i in range(10):
+                current_train = random.sample(train, size)
+                current_train.extend(generated)
+                clusters = kmeans.fit_functions(current_train)
+                train_error.append(kmeans.compute_test_error(clusters, test))
+
+            test_error.append(kmeans.avg(train_error))
+        with open(output_file, 'a') as f:
+            f.write(str(size) + ', ' + str(kmeans.avg(test_error)) + '\n')
+        print('test_error: ' + str(kmeans.avg(test_error)))
+
 
 if __name__ == "__main__":
     # main()

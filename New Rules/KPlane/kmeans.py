@@ -6,7 +6,7 @@ from sklearn import cross_validation
 from cluster import Cluster
 
 DEBUG = False
-N_TIMES = 100
+N_TIMES = 10
 
 
 def avg(lst):
@@ -54,7 +54,7 @@ def kmeans(points, k, cutoff):
 
     # Loop through the dataset until the clusters stabilize
     loop_counter = 0
-    while loop_counter < 200:
+    while loop_counter < 100:
         # Create a list of lists to hold the points in each cluster
         lists = [[] for c in clusters]
         cluster_count = len(clusters)
@@ -135,9 +135,6 @@ def choose_k(points, cutoff=0.1):
             current_error.append(compute_test_error(clusters, test))
 
         validation_error.append(avg(current_error))
-        # stop if the validation error increases or if it is negligible
-        if validation_error[-2] < validation_error[-1]:
-            break
 
         optimal_k = k
         if validation_error[-1] < 0.05:
