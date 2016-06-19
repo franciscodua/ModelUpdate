@@ -69,3 +69,19 @@ class Function(Point):
             error += abs(prediction - p.coords[output_index]) / (abs(prediction) + 0.0000001)
         return error / len(points)
 
+
+class Interval:
+    """
+    Intervals which define the valid hypercube
+    """
+
+    def __init__(self, min_interval, max_interval):
+        """
+        :param min_interval: list with minimum values for each dimension
+        :param max_interval: list with maximum values for each dimension
+        """
+        self.min_interval = min_interval
+        self.max_interval = max_interval
+
+    def intersects(self):
+        pass

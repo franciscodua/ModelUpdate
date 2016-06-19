@@ -3,14 +3,12 @@ import sys
 
 from sklearn import cross_validation
 
+import util
 from cluster import Cluster
 
 DEBUG = False
 N_TIMES = 10
-
-
-def avg(lst):
-    return sum(lst) / len(lst)
+ERROR_THRES = 0.05
 
 
 def compute_mean_error(clusters):
@@ -115,8 +113,8 @@ def choose_k(points, cutoff=0.1):
         test = [points[i] for i in test_index]
         clusters = kmeans(train, 1, cutoff)
         current_error.append(compute_test_error(clusters, test))
-    validation_error.append(avg(current_error))
-    if validation_error[-1] < 0.05:
+    validation_error.append(util.avg(current_error))
+    if validation_error[-1] < ERROR_THRES:
         return 1
 
     for k in range(2, 31):
@@ -134,10 +132,10 @@ def choose_k(points, cutoff=0.1):
 
             current_error.append(compute_test_error(clusters, test))
 
-        validation_error.append(avg(current_error))
+        validation_error.append(util.avg(current_error))
 
         optimal_k = k
-        if validation_error[-1] < 0.05:
+        if validation_error[-1] < ERROR_THRES:
             break
 
     return optimal_k
