@@ -1,5 +1,5 @@
-from Tests import Accuracy
+from Visualization import main
 
-# main.main()
+main.main()
 
-Accuracy.test_acc_speed()
+# Accuracy.test_acc_speed()

@@ -4,8 +4,8 @@ import warnings
 
 from sklearn import cross_validation
 
-import kplane
 import util
+from KPlane import kplane
 
 
 def test_acc_speed():
