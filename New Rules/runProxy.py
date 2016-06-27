@@ -1,5 +1,6 @@
-from Visualization import main
+from Tests import AccuracyAvg
 
-main.main()
+# main.main()
 
 # Accuracy.test_acc_speed()
+AccuracyAvg.test()

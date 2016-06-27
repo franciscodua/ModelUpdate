@@ -66,5 +66,5 @@ class Function(Point):
         error = 0
         for p in points:
             prediction = self.predict(p)
-            error += abs(prediction - p.coords[output_index]) / (abs(prediction) + 0.0000001)
+            error += abs(prediction - p.coords[output_index]) / abs(prediction)
         return error / len(points)

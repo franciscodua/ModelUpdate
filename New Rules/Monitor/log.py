@@ -1,5 +1,4 @@
 class Log:
-
     def __init__(self, file_name):
         self.file_name = file_name
         self.log_list = []
@@ -8,9 +7,9 @@ class Log:
     def log(self, record):
         self.log_list.append(record)
         self.n_items += 1
-        if self.n_items >= 100:
+        if self.n_items >= 1000:
             self.write()
-	print record
+        print record
 
     def write(self):
         with open(self.file_name, 'a') as f:

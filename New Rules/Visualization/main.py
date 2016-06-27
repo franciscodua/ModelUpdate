@@ -4,6 +4,7 @@ import warnings
 import util
 from KPlane import Interval
 from KPlane import kplane
+from KPlane.Rule import Rule
 
 
 def main():
@@ -36,6 +37,12 @@ def main():
         print str(interval) + ": " + str(resulting_intervals[interval].ranges)
 
     print "Average Accuracy: " + str((1 - kplane.compute_test_error(clusters, points)))
+
+    rules = []
+    for interval in resulting_intervals:
+        rules.append(Rule(interval, [c.centroid for c in clusters], points))
+
+    print "Done!"
 
 
 if __name__ == '__main__':

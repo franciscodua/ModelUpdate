@@ -90,3 +90,9 @@ class Interval:
             if not is_overlapping(self.ranges[dimension], interval.ranges[dimension]):
                 return False
         return True
+
+    def belongs(self, point):
+        for dimension in range(len(self.ranges)):
+            if not self.ranges[dimension][0] <= point.coords[dimension] < self.ranges[dimension][1]:
+                return False
+        return True
