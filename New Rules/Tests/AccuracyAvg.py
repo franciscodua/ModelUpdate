@@ -13,15 +13,15 @@ from KPlane.Rule import Rule
 def find_rules(dataset):
     clusters = kplane.fit_functions(dataset)
 
-    intervals = []
+    intervals = [Interval.Interval([(1, 4), (0, 590), (0, 45)])]
 
-    for c in clusters:
-        ranges = []
-        for dim in range(c.n - 1):
-            values = [p.coords[dim] for p in c.points]
-            # print "\t\tDim " + str(dim) + ": " + "(" + str(min(values)) + ", " + str(max(values)) + ")"
-            ranges.append((round(min(values)), round(max(values))))
-        intervals.append(Interval.Interval(ranges))
+    # for c in clusters:
+    #     ranges = []
+    #     for dim in range(c.n - 1):
+    #         values = [p.coords[dim] for p in c.points]
+    #         # print "\t\tDim " + str(dim) + ": " + "(" + str(min(values)) + ", " + str(max(values)) + ")"
+    #         ranges.append((round(min(values)), round(max(values))))
+    #     intervals.append(Interval.Interval(ranges))
 
     resulting_intervals = Interval.split_intervals(intervals)
 
@@ -42,6 +42,8 @@ def compute_test_error(rules, points):
             if rule.interval.belongs(point):
                 prediction = rule.predict(point)
                 real = point.coords[-1]
+                if prediction == 0:
+                    prediction += 0.0000001
                 error += abs(real - prediction) / abs(prediction)
                 break
 
@@ -58,7 +60,7 @@ def test():
 
     find_rules(dataset)
 
-    for size in range(20, 305, 5):
+    for size in range(20, 25, 5):
         kf = cross_validation.KFold(len(dataset), n_folds=10, shuffle=False)
         test_error = []
         for train_index, test_index in kf:
