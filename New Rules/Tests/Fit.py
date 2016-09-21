@@ -12,14 +12,23 @@ def compute_test_error(rules, points):
     error = 0
 
     for point in points:
+        belongs = False
+        real = point.coords[-1]
         for rule in rules:
             if rule.interval.belongs(point):
                 prediction = rule.predict(point)
-                real = point.coords[-1]
+
                 if prediction == 0:
                     prediction += 0.0000001
                 error += abs(real - prediction) / abs(prediction)
                 break
+        if not belongs:
+            predictions = []
+            for rule in rules:
+                for impact in rule.impact_functions:
+                    predictions.append(impact.function.predict(point))
+            errors = [(abs(real - pred) / pred) for pred in predictions]
+            error += min(errors)
 
     return error / len(points)
 
