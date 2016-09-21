@@ -52,15 +52,16 @@ def main():
                     f.write(str(i) + '\n')
 
 
-def run_total():
+def run_total(dataset=[]):
     warnings.filterwarnings("ignore")
-
-    if len(sys.argv) > 1:
-        input_file = sys.argv[1]
+    if not dataset:
+        if len(sys.argv) > 1:
+            input_file = sys.argv[1]
+        else:
+            input_file = raw_input("File containing Samples:")
+        points = util.read_points_csv(input_file)
     else:
-        input_file = raw_input("File containing Samples:")
-
-    points = util.read_points_csv(input_file)
+        points = dataset
 
     clusters = kplane.fit_functions(points)
 
@@ -86,6 +87,7 @@ def run_total():
                 print "\t" + str(impact.probability) + "\t" + str(impact.function)
 
     print "Done!"
+    return rules
 
 if __name__ == '__main__':
     main()

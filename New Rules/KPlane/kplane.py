@@ -8,7 +8,7 @@ from cluster import Cluster
 
 DEBUG = False
 N_TIMES = 10
-ERROR_THRES = 0.05
+ERROR_THRES = 0.3
 
 
 def compute_mean_error(clusters):
@@ -38,7 +38,7 @@ def compute_test_error(clusters, points):
 
 def kmeans(points, k, cutoff):
     """
-    kmeans variant: use functions as clusters centres.
+    kplane variant: use functions as clusters centres.
     Similar to K-Plane
     :param points: list of points
     :param k: number of clusters
@@ -118,6 +118,7 @@ def choose_k(points, cutoff=0.1):
         return 1
 
     for k in range(2, 31):
+        # print "K = " + str(k)
         current_error = []
         error = sys.maxint
         for train_index, test_index in kf:
