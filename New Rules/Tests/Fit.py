@@ -15,19 +15,30 @@ def compute_test_error(rules, points):
         belongs = False
         real = point.coords[-1]
         for rule in rules:
+            if not rule.impact_functions:
+                continue
             if rule.interval.belongs(point):
-                prediction = rule.predict(point)
-
-                if prediction == 0:
-                    prediction += 0.0000001
-                error += abs(real - prediction) / abs(prediction)
+                belongs = True
+                predictions = []
+                for impact in rule.impact_functions:
+                    predictions.append(impact.function.predict(point))
+                errors = []
+                for pred in predictions:
+                    if pred == 0:
+                        pred += 0.0000001
+                    errors.append(abs(real - pred) / abs(pred))
+                error += min(errors)
                 break
         if not belongs:
             predictions = []
             for rule in rules:
                 for impact in rule.impact_functions:
                     predictions.append(impact.function.predict(point))
-            errors = [(abs(real - pred) / pred) for pred in predictions]
+            errors = []
+            for pred in predictions:
+                if pred == 0:
+                    pred += 0.0000001
+                errors.append(abs(real - pred) / abs(pred))
             error += min(errors)
 
     return error / len(points)
@@ -36,8 +47,10 @@ def compute_test_error(rules, points):
 def test_fitting():
     warnings.filterwarnings("ignore")
     if sys.argv > 2:
-        dataset_file = sys.argv[1]
-        output_file = sys.argv[2]
+        # dataset_file = sys.argv[1]
+        dataset_file = '/Users/francisco/Documents/IST/Data/logs-complete/clean.csv'
+        # output_file = sys.argv[2]
+        output_file = '~/out'
     else:
         raise Exception("Error: Not enough arguments")
     dataset = util.read_points_csv(dataset_file)
